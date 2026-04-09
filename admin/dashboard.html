@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="author" content="Uche Okike">
+    <meta name="description" content="AbiaCleanCity - Smart Waste Management">
+    <title>AbiaCleanCity - Admin Dashboard</title>
+    <link rel="icon" href="favicon.ico" type="image/x-icon">
+    <link rel="stylesheet" href="admin.css">
+</head>
+
+<body>
+
+    <div class="dashboard-container">
+
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <h2>CleanCity Admin</h2>
+
+            <ul>
+                <li><a href="#" class="active">Dashboard</a></li>
+                <li><a href="#">Manage Users</a></li>
+                <li><a href="#">Waste Reports</a></li>
+                <li><a href="#">Payments</a></li>
+                <li><a href="#">Schedules</a></li>
+            </ul>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+
+            <!-- Top Navbar -->
+            <div class="topbar">
+
+                <h3>Dashboard Overview</h3>
+
+                <div class="profile">
+                    <span>Admin</span>
+                    <button id="logoutBtn">Logout</button>
+                </div>
+
+            </div>
+
+            <!-- Cards -->
+            <div class="cards">
+
+                <div class="card">
+                    <h3>Total Users</h3>
+                    <p>120</p>
+                </div>
+
+                <div class="card">
+                    <h3>Total Payments</h3>
+                    <p>₦250,000</p>
+                </div>
+
+                <div class="card">
+                    <h3>Reports</h3>
+                    <p>35</p>
+                </div>
+
+            </div>
+
+            <!-- Charts Section -->
+            <div class="charts">
+
+                <div class="chart-card">
+                    <h3>Waste Reports Overview</h3>
+                    <canvas id="reportsChart"></canvas>
+                </div>
+
+                <div class="chart-card">
+                    <h3>Payments Overview</h3>
+                    <canvas id="paymentsChart"></canvas>
+                </div>
+
+            </div>
+
+            <!-- USERS TABLE -->
+            <div class="table-section">
+            
+                <h3>Manage Users</h3>
+            
+                <div class="table-controls">
+                    <input type="text" id="userSearch" placeholder="Search users...">
+                </div>
+            
+                <table id="usersTable">
+            
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Email</th>
+                            <th>Location</th>
+                        </tr>
+                    </thead>
+            
+                    <tbody>
+                        <tr>
+                            <td>John Doe</td>
+                            <td>john@email.com</td>
+                            <td>Aba</td>
+                        </tr>
+            
+                        <tr>
+                            <td>Jane Smith</td>
+                            <td>jane@email.com</td>
+                            <td>Umuahia</td>
+                        </tr>
+            
+                        <tr>
+                            <td>Michael Obi</td>
+                            <td>michael@email.com</td>
+                            <td>Aba South</td>
+                        </tr>
+            
+                    </tbody>
+            
+                </table>
+            
+            </div>
+            
+            
+            <!-- PAYMENTS TABLE -->
+            <div class="table-section">
+            
+                <h3>Payments</h3>
+            
+                <div class="table-controls">
+                    <select id="paymentFilter">
+                        <option value="">All Payments</option>
+                        <option value="Paid">Paid</option>
+                        <option value="Not Paid">Not Paid</option>
+                    </select>
+                </div>
+            
+                <table id="paymentsTable">
+            
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Amount</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+            
+                    <tbody>
+                        <tr>
+                            <td>John Doe</td>
+                            <td>₦1,000</td>
+                            <td class="paid">Paid</td>
+                        </tr>
+            
+                        <tr>
+                            <td>Jane Smith</td>
+                            <td>₦1,000</td>
+                            <td class="not-paid">Not Paid</td>
+                        </tr>
+            
+                        <tr>
+                            <td>Michael Obi</td>
+                            <td>₦1,000</td>
+                            <td class="paid">Paid</td>
+                        </tr>
+            
+                    </tbody>
+            
+                </table>
+            
+            </div>
+            
+            </div>
+            
+            </div>
+            
+            <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="admin.js"></script>
+
+</body>
