@@ -1,80 +1,846 @@
+/* ==========================================================
+ABIACLEAN CITY
+RESIDENT DASHBOARD
+========================================================== */
+
+/* ==========================================================
+RESET
+========================================================== */
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  }
+
 body {
-    margin: 0;
-    font-family: Arial;
-    display: flex;
+min-height: 100vh;
+
+font-family:
+    Arial,
+    Helvetica,
+    sans-serif;
+
+background: #f4f7f6;
+
+color: #263238;
+
+display: flex;
+
 }
 
-/* Sidebar */
+/* ==========================================================
+SIDEBAR
+========================================================== */
+
 .sidebar {
-    width: 220px;
-    background: #2c3e50;
-    color: white;
-    height: 100vh;
-    padding: 20px;
+width: 250px;
+min-height: 100vh;
+
+background: #173b2d;
+
+color: #ffffff;
+
+padding: 28px 18px;
+
+display: flex;
+
+flex-direction: column;
+
+position: fixed;
+
+left: 0;
+top: 0;
+bottom: 0;
+
 }
 
-.sidebar ul {
-    list-style: none;
-    padding: 0;
+.sidebar-brand {
+padding: 0 12px 30px;
+
+border-bottom:
+    1px solid rgba(255, 255, 255, 0.12);
+
 }
 
-.sidebar li {
-    margin: 15px 0;
-    cursor: pointer;
+.sidebar-brand h2 {
+font-size: 25px;
+margin-bottom: 5px;
+
 }
 
-/* Main */
+.sidebar-brand p {
+font-size: 13px;
+
+color: #b9d5c8;
+
+}
+
+/* ==========================================================
+NAVIGATION
+========================================================== */
+
+.sidebar-nav {
+margin-top: 25px;
+display: flex;
+
+flex-direction: column;
+
+gap: 8px;
+
+}
+
+.nav-item {
+width: 100%;
+border: none;
+
+background: transparent;
+
+color: #d8e8df;
+
+padding: 13px 14px;
+
+border-radius: 8px;
+
+text-align: left;
+
+font-size: 15px;
+
+cursor: pointer;
+
+display: flex;
+
+align-items: center;
+
+gap: 12px;
+
+transition:
+    background 0.2s ease,
+    color 0.2s ease;
+
+}
+
+.nav-item span {
+width: 22px;
+
+text-align: center;
+
+}
+
+.nav-item:hover {
+background: rgba(255, 255, 255, 0.08);
+color: #ffffff;
+
+}
+
+.nav-item.active {
+background: #27ae60;
+
+color: #ffffff;
+
+
+}
+
+/* ==========================================================
+SIDEBAR LOGOUT
+========================================================== */
+
+.sidebar-logout {
+margin-top: auto;
+
+width: 100%;
+
+padding: 12px;
+
+border: 1px solid rgba(255, 255, 255, 0.2);
+
+border-radius: 8px;
+
+background: transparent;
+
+color: #ffffff;
+
+cursor: pointer;
+
+font-size: 14px;
+
+}
+
+.sidebar-logout:hover {
+background: rgba(255, 255, 255, 0.08);
+}
+
+/* ==========================================================
+MAIN CONTENT
+========================================================== */
+
 .main {
-    flex: 1;
-    padding: 20px;
+width: calc(100% - 250px);
+
+margin-left: 250px;
+
+min-height: 100vh;
+
+padding: 35px 45px;
+
 }
 
-/* Topbar */
+/* ==========================================================
+TOPBAR
+========================================================== */
+
 .topbar {
-    display: flex;
-    justify-content: space-between;
-    margin-bottom: 20px;
+display: flex;
+
+justify-content: space-between;
+
+align-items: center;
+
+margin-bottom: 40px;
+
 }
 
-/* Sections */
+.topbar-label {
+color: #27ae60;
+
+font-size: 13px;
+
+font-weight: 700;
+
+text-transform: uppercase;
+
+letter-spacing: 0.08em;
+
+margin-bottom: 7px;
+
+}
+
+.topbar h1 {
+font-size: 28px;
+
+color: #173b2d;
+
+}
+
+.mobile-logout {
+display: none;
+}
+
+/* ==========================================================
+SECTIONS
+========================================================== */
+
 .section {
-    display: none;
+display: none;
 }
 
 .section.active {
-    display: block;
+display: block;
 }
 
-/* Inputs */
-input,
-textarea {
-    display: block;
-    margin: 10px 0;
-    padding: 10px;
-    width: 300px;
+.section-heading {
+margin-bottom: 25px;
 }
 
-button {
-    padding: 10px;
-    background: #27ae60;
-    color: white;
-    border: none;
-    cursor: pointer;
+.eyebrow {
+color: #27ae60;
+
+font-size: 12px;
+
+font-weight: 700;
+
+letter-spacing: 0.1em;
+
+margin-bottom: 7px;
+
 }
+
+.section-heading h2 {
+font-size: 24px;
+
+color: #173b2d;
+
+margin-bottom: 7px;
+
+}
+
+.section-heading p:not(.eyebrow) {
+color: #718078;
+
+font-size: 14px;
+
+}
+
+/* ==========================================================
+PROFILE GRID
+========================================================== */
+
+.profile-grid {
+display: grid;
+
+grid-template-columns:
+    repeat(2, minmax(0, 1fr));
+
+gap: 18px;
+
+}
+
+.profile-card {
+background: #ffffff;
+
+border: 1px solid #e2e9e5;
+
+border-radius: 12px;
+
+padding: 22px;
+
+display: flex;
+
+align-items: center;
+
+gap: 16px;
+
+box-shadow:
+    0 3px 12px rgba(0, 0, 0, 0.04);
+
+}
+
+.profile-icon {
+width: 45px;
+
+height: 45px;
+
+flex-shrink: 0;
+
+background: #eaf7ef;
+
+border-radius: 10px;
+
+display: flex;
+
+align-items: center;
+
+justify-content: center;
+
+font-size: 20px;
+
+}
+
+.profile-card > div:last-child {
+min-width: 0;
+}
+
+.profile-label {
+display: block;
+
+color: #819087;
+
+font-size: 12px;
+
+margin-bottom: 5px;
+
+}
+
+.profile-card strong {
+display: block;
+
+color: #26382f;
+
+font-size: 15px;
+
+word-break: break-word;
+
+}
+
+/* ==========================================================
+PAYMENT CARD
+========================================================== */
+
+.payment-card {
+background: #ffffff;
+
+border: 1px solid #e2e9e5;
+
+border-radius: 14px;
+
+padding: 30px;
+
+display: grid;
+
+grid-template-columns:
+    1fr auto auto;
+
+align-items: center;
+
+gap: 35px;
+
+box-shadow:
+    0 3px 12px rgba(0, 0, 0, 0.04);
+
+}
+
+.card-label {
+display: block;
+
+color: #819087;
+
+font-size: 12px;
+
+margin-bottom: 7px;
+
+}
+
+.payment-card h3 {
+color: #d68910;
+
+font-size: 20px;
+
+margin-bottom: 5px;
+
+}
+
+.payment-card p {
+color: #718078;
+font-size: 13px;
+
+}
+
+.payment-amount {
+text-align: center;
+}
+
+.payment-amount span {
+display: block;
+
+color: #819087;
+
+font-size: 12px;
+
+margin-bottom: 5px;
+
+}
+
+.payment-amount strong {
+font-size: 22px;
+
+color: #173b2d;
+
+}
+
+/* ==========================================================
+BUTTONS
+========================================================== */
+
+.primary-btn,
+#payNowBtn {
+border: none;
+
+background: #27ae60;
+
+color: #ffffff;
+
+padding: 12px 20px;
+
+border-radius: 7px;
+
+cursor: pointer;
+
+font-size: 14px;
+
+transition:
+    background 0.2s ease,
+    transform 0.2s ease;
+
+}
+
+.primary-btn:hover,
+#payNowBtn:hover {
+background: #219653;
+
+transform: translateY(-1px);
+
+}
+
+#payNowBtn:disabled {
+background: #95a99d;
+
+cursor: not-allowed;
+
+transform: none;
+
+}
+
+.secondary-btn {
+width: 100%;
+
+border: 1px solid #d7dfda;
+
+background: #ffffff;
+
+color: #526158;
+
+padding: 11px;
+
+border-radius: 7px;
+
+cursor: pointer;
+
+margin-top: 10px;
+
+}
+
+.secondary-btn:hover {
+background: #f5f7f6;
+}
+
+/* ==========================================================
+FORM CARD
+========================================================== */
+
+.form-card {
+max-width: 700px;
+
+
+background: #ffffff;
+
+border: 1px solid #e2e9e5;
+
+border-radius: 14px;
+
+padding: 28px;
+
+box-shadow:
+    0 3px 12px rgba(0, 0, 0, 0.04);
+
+}
+
+.form-card label {
+display: block;
+
+font-size: 13px;
+
+font-weight: 600;
+
+color: #44534b;
+
+margin-bottom: 7px;
+
+margin-top: 18px;
+
+}
+
+.form-card label:first-child {
+margin-top: 0;
+}
+
+.form-card input,
+.form-card textarea {
+width: 100%;
+padding: 12px 14px;
+
+border: 1px solid #d6e0da;
+
+border-radius: 7px;
+
+font-size: 14px;
+
+font-family: inherit;
+
+outline: none;
+
+}
+
+.form-card textarea {
+min-height: 150px;
+
+resize: vertical;
+
+}
+
+.form-card input:focus,
+.form-card textarea:focus {
+border-color: #27ae60;
+
+box-shadow:
+    0 0 0 3px rgba(39, 174, 96, 0.1);
+
+}
+
+.form-card .primary-btn {
+margin-top: 20px;
+}
+
+/* ==========================================================
+MODAL
+========================================================== */
 
 .modal {
-    display: none;
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.5);
+display: none;
+
+position: fixed;
+
+z-index: 1000;
+
+inset: 0;
+
+background:
+    rgba(18, 35, 27, 0.65);
+
+align-items: center;
+
+justify-content: center;
+
+padding: 20px;
+
 }
 
 .modal-content {
-    background: white;
+width: 100%;
+
+max-width: 440px;
+
+background: #ffffff;
+
+border-radius: 14px;
+
+padding: 30px;
+
+position: relative;
+
+box-shadow:
+    0 20px 50px rgba(0, 0, 0, 0.2);
+
+}
+
+.modal-content h3 {
+color: #173b2d;
+font-size: 21px;
+
+margin-bottom: 7px;
+
+}
+
+.modal-description {
+color: #718078;
+font-size: 13px;
+
+margin-bottom: 20px;
+
+}
+
+.modal-close {
+position: absolute;
+
+top: 12px;
+
+right: 15px;
+
+border: none;
+
+background: transparent;
+
+font-size: 25px;
+
+color: #718078;
+
+cursor: pointer;
+
+}
+
+.form-group {
+margin-bottom: 16px;
+}
+
+.form-group label {
+display: block;
+color: #44534b;
+
+font-size: 12px;
+
+font-weight: 600;
+
+margin-bottom: 6px;
+
+}
+
+.form-group input {
+width: 100%;
+padding: 11px 12px;
+
+border: 1px solid #d6e0da;
+
+border-radius: 7px;
+
+font-size: 14px;
+
+outline: none;
+
+}
+
+.form-group input:focus {
+border-color: #27ae60;
+}
+
+.payment-row {
+display: grid;
+grid-template-columns:1fr 1fr;
+gap: 12px;
+
+}
+
+.modal-content .primary-btn {
+width: 100%;
+margin-top: 5px;
+
+
+}
+
+/* ==========================================================
+RESPONSIVE
+========================================================== */
+
+@media (max-width: 900px) {
+
+
+.sidebar {
+    width: 210px;
+}
+
+
+.main {
+    width: calc(100% - 210px);
+
+    margin-left: 210px;
+
+    padding: 30px;
+}
+
+
+.profile-grid {
+    grid-template-columns: 1fr;
+}
+
+
+.payment-card {
+    grid-template-columns: 1fr;
+
+    gap: 20px;
+
+    align-items: flex-start;
+}
+
+
+.payment-amount {
+    text-align: left;
+}
+
+}
+
+@media (max-width: 700px) {
+
+body {
+    display: block;
+}
+
+
+.sidebar {
+    position: relative;
+
+    width: 100%;
+
+    min-height: auto;
+
+    padding: 18px;
+}
+
+
+.sidebar-brand {
+    padding-bottom: 18px;
+}
+
+
+.sidebar-nav {
+    margin-top: 15px;
+
+    display: grid;
+
+    grid-template-columns:
+        repeat(2, 1fr);
+}
+
+
+.sidebar-logout {
+    display: none;
+}
+
+
+.main {
+    width: 100%;
+
+    margin-left: 0;
+
+    padding: 25px 18px;
+}
+
+
+.topbar {
+    align-items: flex-start;
+
+    gap: 15px;
+}
+
+
+.topbar h1 {
+    font-size: 22px;
+}
+
+
+.mobile-logout {
+    display: block;
+
+    border: none;
+
+    background: #173b2d;
+
+    color: #ffffff;
+
+    padding: 9px 12px;
+
+    border-radius: 6px;
+
+    cursor: pointer;
+
+    white-space: nowrap;
+}
+
+}
+
+@media (max-width: 450px) {
+
+
+.sidebar-nav {
+    grid-template-columns: 1fr;
+}
+
+
+.profile-card {
+    padding: 17px;
+}
+
+
+.form-card {
     padding: 20px;
-    margin: 10% auto;
-    width: 300px;
+}
+
+
+.payment-row {
+    grid-template-columns: 1fr;
+}
+
+
+.modal-content {
+    padding: 25px 20px;
+}
+
+
 }

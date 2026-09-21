@@ -618,7 +618,7 @@ if (loginForm) {
         -------------------------------------------------- */
 
         window.location.href =
-            "dashboard.html";
+            "user/dashboard.html";
 
     });
 

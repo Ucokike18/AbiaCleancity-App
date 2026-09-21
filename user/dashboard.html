@@ -6,88 +6,390 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="author" content="Uche Okike">
     <meta name="description" content="AbiaCleanCity - Smart Waste Management">
+
     <title>AbiaCleanCity - User Dashboard</title>
-    <link rel="icon" href="favicon.ico" type="image/x-icon">
+
+    <link rel="icon" href="../favicon.ico" type="image/x-icon">
     <link rel="stylesheet" href="user.css">
 
 </head>
 
 <body>
 
-    <!-- Sidebar -->
-    <div class="sidebar">
-        <h2>CleanCity</h2>
-        <ul>
-            <li onclick="showSection('profile')">Profile</li>
-            <li onclick="showSection('payment')">Payments</li>
-            <li onclick="showSection('report')">Report Waste</li>
-            <li onclick="showSection('recycle')">Sell Recyclables</li>
-        </ul>
-    </div>
+    <!-- =====================================================
+     SIDEBAR
+====================================================== -->
 
-    <!-- Main Content -->
-    <div class="main">
+    <aside class="sidebar">
 
-        <!-- Topbar -->
-        <div class="topbar">
-            <h3>User Dashboard</h3>
-            <button id="logoutBtn" onclick="logout()">Logout</button>
+        <div class="sidebar-brand">
+            <h2>CleanCity</h2>
+            <p>Resident Portal</p>
         </div>
 
-        <!-- PROFILE -->
-        <div id="profile" class="section active">
-            <h2>Your Profile</h2>
-            <p><strong>Name:</strong> <span id="userName"></span></p>
-            <p><strong>Email:</strong> <span id="email"></span></p>
-            <p><strong>Phone:</strong> <span id="phone"></span></p>
-            <p><strong>Address:</strong> <span id="userAddress"></span></p>
-            <p><strong>Building:</strong> <span id="building"></span></p>
-            <p><strong>User Type:</strong> <span id="userType"></span></p>
-        </div>
+        <nav class="sidebar-nav">
 
-        <!-- PAYMENT -->
-        <div id="payment" class="section">
-            <h2>Payment</h2>
-        
-            <p>Status: <span id="paymentStatus">Not Paid</span></p>
-        
-            <button onclick="openPaymentModal()">Pay Now</button>
-        
-            <!-- PAYMENT MODAL -->
-            <div id="paymentModal" class="modal">
-                <div class="modal-content">
-                    <h3>Pay Waste Levy</h3>
-        
-                    <p>Amount: ₦5,000</p>
-        
-                    <input type="text" placeholder="Card Number">
-                    <input type="text" placeholder="Expiry Date">
-                    <input type="text" placeholder="CVV">
-        
-                    <button onclick="confirmPayment()">Confirm Payment</button>
-                    <button onclick="closeModal()">Cancel</button>
+            <button class="nav-item active" onclick="showSection('profile', this)">
+                <span>👤</span>
+                Profile
+            </button>
+
+            <button class="nav-item" onclick="showSection('payment', this)">
+                <span>💳</span>
+                Payments
+            </button>
+
+            <button class="nav-item" onclick="showSection('report', this)">
+                <span>⚠️</span>
+                Report Waste
+            </button>
+
+            <button class="nav-item" onclick="showSection('recycle', this)">
+                <span>♻️</span>
+                Sell Recyclables
+            </button>
+
+        </nav>
+
+        <button class="sidebar-logout" onclick="logout()">
+            Logout
+        </button>
+
+    </aside>
+
+
+    <!-- =====================================================
+     MAIN CONTENT
+====================================================== -->
+
+    <main class="main">
+
+        <!-- TOPBAR -->
+
+        <header class="topbar">
+
+            <div>
+                <p class="topbar-label">Resident Dashboard</p>
+                <h1>Welcome, <span id="welcomeName">Resident</span></h1>
+            </div>
+
+            <button class="mobile-logout" onclick="logout()">
+                Logout
+            </button>
+
+        </header>
+
+
+        <!-- =================================================
+         PROFILE SECTION
+    ================================================== -->
+
+        <section id="profile" class="section active">
+
+            <div class="section-heading">
+                <div>
+                    <p class="eyebrow">ACCOUNT</p>
+                    <h2>Your Profile</h2>
+                    <p>View your registered AbiaCleanCity information.</p>
                 </div>
             </div>
-        </div>
 
-        <!-- REPORT -->
-        <div id="report" class="section">
-            <h2>Report Waste Issue</h2>
-            <textarea id="issue" placeholder="Describe issue..."></textarea>
-            <button onclick="submitIssue()">Submit</button>
-        </div>
 
-        <!-- RECYCLE -->
-        <div id="recycle" class="section">
-            <h2>Sell Recyclable Waste</h2>
-            <input type="text" id="item" placeholder="Item (e.g. plastic)">
-            <input type="number" id="quantity" placeholder="Quantity">
-            <button onclick="sellItem()">Submit</button>
-        </div>
+            <div class="profile-grid">
 
-    </div>
+                <div class="profile-card">
 
-    <script src="user/dashboard.js"></script>
+                    <div class="profile-icon">
+                        👤
+                    </div>
+
+                    <div>
+                        <span class="profile-label">Full Name</span>
+                        <strong id="userName">-</strong>
+                    </div>
+
+                </div>
+
+
+                <div class="profile-card">
+
+                    <div class="profile-icon">
+                        ✉️
+                    </div>
+
+                    <div>
+                        <span class="profile-label">Email</span>
+                        <strong id="email">-</strong>
+                    </div>
+
+                </div>
+
+
+                <div class="profile-card">
+
+                    <div class="profile-icon">
+                        📱
+                    </div>
+
+                    <div>
+                        <span class="profile-label">Phone</span>
+                        <strong id="phone">-</strong>
+                    </div>
+
+                </div>
+
+
+                <div class="profile-card">
+
+                    <div class="profile-icon">
+                        🏠
+                    </div>
+
+                    <div>
+                        <span class="profile-label">Residential Address</span>
+                        <strong id="userAddress">-</strong>
+                    </div>
+
+                </div>
+
+
+                <div class="profile-card">
+
+                    <div class="profile-icon">
+                        🏢
+                    </div>
+
+                    <div>
+                        <span class="profile-label">Building Type</span>
+                        <strong id="building">-</strong>
+                    </div>
+
+                </div>
+
+
+                <div class="profile-card">
+
+                    <div class="profile-icon">
+                        👥
+                    </div>
+
+                    <div>
+                        <span class="profile-label">Resident Type</span>
+                        <strong id="userType">-</strong>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- =================================================
+         PAYMENT SECTION
+    ================================================== -->
+
+        <section id="payment" class="section">
+
+            <div class="section-heading">
+
+                <div>
+                    <p class="eyebrow">PAYMENTS</p>
+                    <h2>Waste Levy</h2>
+                    <p>Manage your waste collection payment.</p>
+                </div>
+
+            </div>
+
+
+            <div class="payment-card">
+
+                <div>
+
+                    <span class="card-label">
+                        Current Payment Status
+                    </span>
+
+                    <h3 id="paymentStatus">
+                        Pending
+                    </h3>
+
+                    <p>
+                        Annual waste management levy
+                    </p>
+
+                </div>
+
+
+                <div class="payment-amount">
+
+                    <span>Amount</span>
+
+                    <strong>₦5,000</strong>
+
+                </div>
+
+
+                <button id="payNowBtn" onclick="openPaymentModal()">
+                    Pay Now
+                </button>
+
+            </div>
+
+
+            <!-- PAYMENT MODAL -->
+
+            <div id="paymentModal" class="modal">
+
+                <div class="modal-content">
+
+                    <button class="modal-close" onclick="closeModal()">
+                        &times;
+                    </button>
+
+                    <h3>Pay Waste Levy</h3>
+
+                    <p class="modal-description">
+                        Enter your payment details below.
+                    </p>
+
+                    <div class="form-group">
+
+                        <label for="cardNumber">
+                            Card Number
+                        </label>
+
+                        <input type="text" id="cardNumber" placeholder="1234 5678 9012 3456">
+
+                    </div>
+
+
+                    <div class="payment-row">
+
+                        <div class="form-group">
+
+                            <label for="expiryDate">
+                                Expiry Date
+                            </label>
+
+                            <input type="text" id="expiryDate" placeholder="MM/YY">
+
+                        </div>
+
+
+                        <div class="form-group">
+
+                            <label for="cvv">
+                                CVV
+                            </label>
+
+                            <input type="password" id="cvv" placeholder="123">
+
+                        </div>
+
+                    </div>
+
+
+                    <button class="primary-btn" onclick="confirmPayment()">
+                        Confirm Payment
+                    </button>
+
+                    <button class="secondary-btn" onclick="closeModal()">
+                        Cancel
+                    </button>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- =================================================
+         REPORT SECTION
+    ================================================== -->
+
+        <section id="report" class="section">
+
+            <div class="section-heading">
+
+                <div>
+                    <p class="eyebrow">WASTE REPORT</p>
+                    <h2>Report a Waste Issue</h2>
+                    <p>
+                        Help us identify waste collection problems
+                        in your area.
+                    </p>
+                </div>
+
+            </div>
+
+
+            <div class="form-card">
+
+                <label for="issue">
+                    Describe the issue
+                </label>
+
+                <textarea id="issue"
+                    placeholder="Describe the waste issue, location, or collection problem..."></textarea>
+
+                <button class="primary-btn" onclick="submitIssue()">
+                    Submit Report
+                </button>
+
+            </div>
+
+        </section>
+
+
+        <!-- =================================================
+         RECYCLING SECTION
+    ================================================== -->
+
+        <section id="recycle" class="section">
+
+            <div class="section-heading">
+
+                <div>
+                    <p class="eyebrow">RECYCLING</p>
+                    <h2>Sell Recyclables</h2>
+                    <p>
+                        Submit recyclable materials for collection.
+                    </p>
+                </div>
+
+            </div>
+
+
+            <div class="form-card">
+
+                <label for="item">
+                    Recyclable Item
+                </label>
+
+                <input type="text" id="item" placeholder="e.g. Plastic bottles">
+
+
+                <label for="quantity">
+                    Quantity
+                </label>
+
+                <input type="number" id="quantity" min="1" placeholder="Enter quantity">
+
+
+                <button class="primary-btn" onclick="sellItem()">
+                    Submit Request
+                </button>
+
+            </div>
+
+        </section>
+
+    </main>
+
+
+    <script src="dashboard.js"></script>
 </body>
 
 </html>
