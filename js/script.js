@@ -477,3 +477,150 @@ if (registerForm) {
     });
 
 }
+
+/* ==========================================================
+   LOGIN SYSTEM
+========================================================== */
+
+const loginForm = document.getElementById("loginForm");
+
+
+if (loginForm) {
+
+    loginForm.addEventListener("submit", function (event) {
+
+        event.preventDefault();
+
+
+        /* --------------------------------------------------
+           GET LOGIN DATA
+        -------------------------------------------------- */
+
+        const email = document
+            .getElementById("loginEmail")
+            .value
+            .trim()
+            .toLowerCase();
+
+        const password = document
+            .getElementById("loginPassword")
+            .value;
+
+
+        /* --------------------------------------------------
+           VALIDATE INPUT
+        -------------------------------------------------- */
+
+        if (!email || !password) {
+
+            alert("Please enter your email and password.");
+
+            return;
+        }
+
+
+        /* --------------------------------------------------
+           GET REGISTERED USER
+        -------------------------------------------------- */
+
+        const storedUser =
+            localStorage.getItem(USER_DATA_KEY);
+
+
+        if (!storedUser) {
+
+            alert(
+                "No account was found. Please create an account first."
+            );
+
+            return;
+        }
+
+
+        /* --------------------------------------------------
+           READ USER DATA
+        -------------------------------------------------- */
+
+        let user;
+
+        try {
+
+            user = JSON.parse(storedUser);
+
+        } catch (error) {
+
+            console.error(
+                "Could not read user data:",
+                error
+            );
+
+            alert(
+                "There was a problem reading your account. Please register again."
+            );
+
+            return;
+        }
+
+
+        /* --------------------------------------------------
+           VERIFY EMAIL
+        -------------------------------------------------- */
+
+        if (
+            !user.email ||
+            user.email.toLowerCase() !== email
+        ) {
+
+            alert("Invalid email or password.");
+
+            return;
+        }
+
+
+        /* --------------------------------------------------
+           VERIFY PASSWORD
+        -------------------------------------------------- */
+
+        if (user.password !== password) {
+
+            alert("Invalid email or password.");
+
+            return;
+        }
+
+
+        /* --------------------------------------------------
+           SAVE CURRENT SESSION
+        -------------------------------------------------- */
+
+        localStorage.setItem(
+            "abiaCleanCityCurrentUser",
+            JSON.stringify({
+                id: user.id,
+                name: user.name,
+                email: user.email,
+                role: user.role
+            })
+        );
+
+
+        /* --------------------------------------------------
+           LOGIN SUCCESS
+        -------------------------------------------------- */
+
+        alert(
+            `Welcome back, ${user.name}!`
+        );
+
+
+        /* --------------------------------------------------
+           REDIRECT
+        -------------------------------------------------- */
+
+        window.location.href =
+            "dashboard.html";
+
+    });
+
+}
+
