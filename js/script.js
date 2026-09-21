@@ -1,137 +1,479 @@
+/* ==========================================================
+   ABIACLEAN CITY
+   REGISTRATION SYSTEM
+========================================================== */
+
+
+/* ==========================================================
+   STORAGE KEY
+========================================================== */
+
+const USER_DATA_KEY = "abiaCleanCityUser";
+
+
+/* ==========================================================
+   ELEMENTS
+========================================================== */
+
 const registerForm = document.getElementById("registerForm");
 
+const step1 = document.getElementById("step1");
+const step2 = document.getElementById("step2");
+
+const continueBtn = document.getElementById("continueBtn");
+const backButton = document.getElementById("backButton");
+
+const progressStep1 = document.getElementById("progressStep1");
+const progressStep2 = document.getElementById("progressStep2");
+const progressLine = document.getElementById("progressLine");
+
+const errorMsg = document.getElementById("errorMsg");
+
+
+/* ==========================================================
+   HELPER FUNCTIONS
+========================================================== */
+
+function showError(message) {
+    if (errorMsg) {
+        errorMsg.textContent = message;
+    }
+}
+
+
+function clearError() {
+    if (errorMsg) {
+        errorMsg.textContent = "";
+    }
+}
+
+
+/* ==========================================================
+   SHOW STEP 1
+========================================================== */
+
+function showStep1() {
+
+    step1.classList.add("active");
+    step2.classList.remove("active");
+
+    progressStep1.classList.add("active");
+    progressStep1.classList.remove("completed");
+
+    progressStep2.classList.remove("active");
+
+    progressLine.classList.remove("active");
+
+    clearError();
+}
+
+
+/* ==========================================================
+   SHOW STEP 2
+========================================================== */
+
+function showStep2() {
+
+    step1.classList.remove("active");
+    step2.classList.add("active");
+
+    progressStep1.classList.remove("active");
+    progressStep1.classList.add("completed");
+
+    progressStep2.classList.add("active");
+
+    progressLine.classList.add("active");
+
+    clearError();
+}
+
+
+/* ==========================================================
+   STEP 1 VALIDATION
+========================================================== */
+
+function validateStep1() {
+
+    const name = document
+        .getElementById("name")
+        .value
+        .trim();
+
+    const email = document
+        .getElementById("email")
+        .value
+        .trim()
+        .toLowerCase();
+
+    const phone = document
+        .getElementById("phone")
+        .value
+        .trim();
+
+    const password = document
+        .getElementById("password")
+        .value;
+
+    const confirmPassword = document
+        .getElementById("confirmPassword")
+        .value;
+
+
+    /* ------------------------------------------------------
+       REQUIRED FIELDS
+    ------------------------------------------------------ */
+
+    if (
+        !name ||
+        !email ||
+        !phone ||
+        !password ||
+        !confirmPassword
+    ) {
+        showError("Please complete all fields.");
+        return false;
+    }
+
+
+    /* ------------------------------------------------------
+       NAME
+    ------------------------------------------------------ */
+
+    if (name.length < 3) {
+
+        showError("Please enter your full name.");
+
+        return false;
+    }
+
+
+    /* ------------------------------------------------------
+       EMAIL
+    ------------------------------------------------------ */
+
+    const emailPattern =
+        /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    if (!emailPattern.test(email)) {
+
+        showError("Please enter a valid email address.");
+
+        return false;
+    }
+
+
+    /* ------------------------------------------------------
+       PHONE
+    ------------------------------------------------------ */
+
+    const phonePattern =
+        /^[0-9+\s()-]{7,20}$/;
+
+    if (!phonePattern.test(phone)) {
+
+        showError("Please enter a valid phone number.");
+
+        return false;
+    }
+
+
+    /* ------------------------------------------------------
+       PASSWORD
+    ------------------------------------------------------ */
+
+    if (password.length < 6) {
+
+        showError(
+            "Password must contain at least 6 characters."
+        );
+
+        return false;
+    }
+
+
+    /* ------------------------------------------------------
+       PASSWORD MATCH
+    ------------------------------------------------------ */
+
+    if (password !== confirmPassword) {
+
+        showError("Passwords do not match.");
+
+        return false;
+    }
+
+
+    return true;
+}
+
+
+/* ==========================================================
+   DISPLAY ACCOUNT SUMMARY
+========================================================== */
+
+function displayAccountSummary() {
+
+    const name = document
+        .getElementById("name")
+        .value
+        .trim();
+
+    const email = document
+        .getElementById("email")
+        .value
+        .trim()
+        .toLowerCase();
+
+    const phone = document
+        .getElementById("phone")
+        .value
+        .trim();
+
+
+    document.getElementById("previewName")
+        .textContent = name;
+
+    document.getElementById("previewEmail")
+        .textContent = email;
+
+    document.getElementById("previewPhone")
+        .textContent = phone;
+}
+
+
+/* ==========================================================
+   STEP 1 → STEP 2
+========================================================== */
+
+if (continueBtn) {
+
+    continueBtn.addEventListener("click", function () {
+
+        clearError();
+
+
+        /* --------------------------------------------------
+           VALIDATE STEP 1
+        -------------------------------------------------- */
+
+        if (!validateStep1()) {
+            return;
+        }
+
+
+        /* --------------------------------------------------
+           DISPLAY ACCOUNT DATA
+        -------------------------------------------------- */
+
+        displayAccountSummary();
+
+
+        /* --------------------------------------------------
+           MOVE TO STEP 2
+        -------------------------------------------------- */
+
+        showStep2();
+
+    });
+}
+
+
+/* ==========================================================
+   STEP 2 → STEP 1
+========================================================== */
+
+if (backButton) {
+
+    backButton.addEventListener("click", function () {
+
+        showStep1();
+
+    });
+}
+
+
+/* ==========================================================
+   COMPLETE REGISTRATION
+========================================================== */
+
 if (registerForm) {
-  registerForm.addEventListener("submit", function (e) {
-    e.preventDefault();
 
-    // Store data
-    localStorage.setItem("name", document.getElementById("name").value);
-    localStorage.setItem("email", document.getElementById("email").value);
-    localStorage.setItem("phone", document.getElementById("phone").value);
+    registerForm.addEventListener("submit", function (event) {
 
-    // Go to step 2
-    window.location.href = "register2.html";
-  });
-}
+        event.preventDefault();
 
-const registerStep2 = document.getElementById("registerStep2");
+        clearError();
 
-if (registerStep2) {
-  registerStep2.addEventListener("submit", function (e) {
-    e.preventDefault();
 
-    // Get step 2 data
-    const address = document.querySelector("#registerStep2 input").value;
-    const buildingType = document.getElementById("buildingType").value;
-    const userType = document.getElementById("userType").value;
+        /* --------------------------------------------------
+           GET STEP 2 DATA
+        -------------------------------------------------- */
 
-    // Combine with step 1 data
-    const userData = {
-      name: localStorage.getItem("name"),
-      email: localStorage.getItem("email"),
-      address,
-      buildingType,
-      userType,
-    };
+        const address = document
+            .getElementById("address")
+            .value
+            .trim();
 
-    console.log(userData);
+        const buildingType = document
+            .getElementById("buildingType")
+            .value;
 
-    // Simulate success
-    alert("Registration Complete!");
+        const userType = document
+            .getElementById("userType")
+            .value;
 
-    // Clear temp storage
-    localStorage.clear();
 
-    // Redirect
-    window.location.href = "dashboard.html";
-  });
-}
+        /* --------------------------------------------------
+           VALIDATE STEP 2
+        -------------------------------------------------- */
 
-// PREFILL STEP 2 FORM WITH STEP 1 DATA
-const previewName = document.getElementById("previewName");
-const previewEmail = document.getElementById("previewEmail");
-const previewPhone = document.getElementById("previewPhone");
+        if (!address || !buildingType || !userType) {
 
-if(previewName){
-  previewName.value = localStorage.getItem("name") || "";
-  previewEmail.value = localStorage.getItem("email") || "";
-  previewPhone.value = localStorage.getItem("phone") || "";
-}
+            showError(
+                "Please complete all the required fields."
+            );
 
-// STEP 2 FORM LOGIC
-const registerStep2 = document.getElementById("registerStep2");
+            return;
+        }
 
-if (registerStep2) {
-  registerStep2.addEventListener("submit", function (e) {
-    e.preventDefault();
 
-    const address = document.getElementById("address").value;
-    const buildingType = document.getElementById("buildingType").value;
-    const userType = document.getElementById("userType").value;
+        if (address.length < 5) {
 
-    const errorMsg = document.getElementById("errorMsg");
+            showError(
+                "Please enter a valid residential address."
+            );
 
-    // VALIDATION
-    if (address === "" || buildingType === "" || userType === "") {
-      errorMsg.innerText = "Please fill all fields correctly.";
-      return;
-    }
+            return;
+        }
 
-    // Combine data
-    const userData = {
-      name: localStorage.getItem("name"),
-      email: localStorage.getItem("email"),
-      phone: localStorage.getItem("phone"),
-      address,
-      buildingType,
-      userType,
-    };
 
-    console.log(userData);
+        /* --------------------------------------------------
+           GET STEP 1 DATA
+        -------------------------------------------------- */
 
-    // Clear storage
-    localStorage.clear();
+        const name = document
+            .getElementById("name")
+            .value
+            .trim();
 
-    // Redirect
-    window.location.href = "dashboard.html";
-  });
-}
+        const email = document
+            .getElementById("email")
+            .value
+            .trim()
+            .toLowerCase();
 
-const registerStep2 = document.getElementById("registerStep2");
+        const phone = document
+            .getElementById("phone")
+            .value
+            .trim();
 
-if(registerStep2){
-  registerStep2.addEventListener("submit", function (e) {
-    e.preventDefault();
+        const password = document
+            .getElementById("password")
+            .value;
 
-    const name = document.getElementById("previewName").value;
-    const email = document.getElementById("previewEmail").value;
-    const phone = document.getElementById("previewPhone").value;
 
-    const address = document.getElementById("address").value;
-    const buildingType = document.getElementById("buildingType").value;
-    const userType = document.getElementById("userType").value;
+        /* --------------------------------------------------
+           CHECK EXISTING USER
+        -------------------------------------------------- */
 
-    const errorMsg = document.getElementById("errorMsg");
+        const existingUser =
+            localStorage.getItem(USER_DATA_KEY);
 
-    // VALIDATION
-    if (!name || !email || !phone || !address || !buildingType || !userType) {
-      errorMsg.innerText = "Please fill all fields correctly.";
-      return;
-    }
+        if (existingUser) {
 
-    const userData = {
-      name,
-      email,
-      phone,
-      address,
-      buildingType,
-      userType,
-    };
+            try {
 
-    console.log(userData);
+                const user =
+                    JSON.parse(existingUser);
 
-    localStorage.clear();
+                if (
+                    user.email &&
+                    user.email.toLowerCase() === email
+                ) {
 
-    window.location.href = "dashboard.html";
-  });
+                    showError(
+                        "An account with this email already exists."
+                    );
+
+                    showStep1();
+
+                    return;
+                }
+
+            } catch (error) {
+
+                console.error(
+                    "Could not read existing user:",
+                    error
+                );
+
+            }
+        }
+
+
+        /* --------------------------------------------------
+           CREATE USER
+        -------------------------------------------------- */
+
+        const userData = {
+
+            id: Date.now(),
+
+            name,
+
+            email,
+
+            phone,
+
+            password,
+
+            address,
+
+            buildingType,
+
+            userType,
+
+            role: "resident",
+
+            createdAt:
+                new Date().toISOString(),
+
+            paymentStatus: "Pending",
+
+            notifications: [],
+
+            reports: [],
+
+            collectionSchedule: null
+
+        };
+
+
+        /* --------------------------------------------------
+           SAVE USER
+        -------------------------------------------------- */
+
+        localStorage.setItem(
+            USER_DATA_KEY,
+            JSON.stringify(userData)
+        );
+
+
+        /* --------------------------------------------------
+           SUCCESS
+        -------------------------------------------------- */
+
+        alert(
+            "Your AbiaCleanCity account has been created successfully."
+        );
+
+
+        /* --------------------------------------------------
+           LOGIN
+        -------------------------------------------------- */
+
+        window.location.href = "../login.html";
+
+    });
+
 }

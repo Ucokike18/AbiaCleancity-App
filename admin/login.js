@@ -1,12 +1,28 @@
-document.getElementById("adminLogin").addEventListener("submit", (e) => {
-  e.preventDefault();
+const loginForm = document.getElementById("loginForm");
 
-  const username = document.getElementById("username").value;
-  const password = document.getElementById("password").value;
+if (loginForm) {
+  loginForm.addEventListener("submit", function (e) {
+    e.preventDefault();
 
-  if (username === "admin" && password === "1234") {
-    window.location.href = "admin.html";
-  } else {
-    alert("Invalid login");
-  }
-});
+    const email = document.getElementById("loginEmail").value.trim();
+    const password = document.getElementById("loginPassword").value.trim();
+
+    let users = JSON.parse(localStorage.getItem("users")) || [];
+
+    console.log("Users:", users); // DEBUG
+    console.log("Entered:", email, password); // DEBUG
+
+    let user = users.find(u => 
+      u.email.trim() === email && u.password === password
+    );
+
+    if (!user) {
+      alert("Invalid email or password");
+      return;
+    }
+
+    localStorage.setItem("currentUser", JSON.stringify(user));
+
+    window.location.href = "user/dashboard.html";
+  });
+}

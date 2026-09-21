@@ -87,13 +87,16 @@
                     <input type="text" id="userSearch" placeholder="Search users...">
                 </div>
             
-                <table id="usersTable">
+                <table id="usersTableBody">
             
                     <thead>
                         <tr>
                             <th>Name</th>
                             <th>Email</th>
                             <th>Location</th>
+                            <th>Address</th>
+                            <th>Building</th>
+                            <th>User Type</th>
                         </tr>
                     </thead>
             
@@ -136,7 +139,7 @@
                     </select>
                 </div>
             
-                <table id="paymentsTable">
+                <table id="paymentsTableBody">
             
                     <thead>
                         <tr>
@@ -146,7 +149,7 @@
                         </tr>
                     </thead>
             
-                    <tbody>
+                    <tbody id="usersTableBody">
                         <tr>
                             <td>John Doe</td>
                             <td>₦1,000</td>
@@ -167,6 +170,18 @@
             
                     </tbody>
             
+                </table>
+                <h2>Waste Reports</h2>
+                
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Issue</th>
+                            <th>Date</th>
+                        </tr>
+                    </thead>
+                
+                    <tbody id="reportsTableBody"></tbody>
                 </table>
             
             </div>

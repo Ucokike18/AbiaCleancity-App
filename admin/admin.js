@@ -93,4 +93,81 @@ if (paymentFilter) {
   });
 }
 
+// LOAD USERS INTO ADMIN TABLE
+const usersTableBody = document.getElementById("usersTableBody");
+
+if(usersTableBody){
+
+let users = JSON.parse(localStorage.getItem("users")) || [];
+
+usersTableBody.innerHTML = "";
+
+users.forEach(user => {
+
+let row = `
+<tr>
+<td>${user.name}</td>
+<td>${user.email}</td>
+<td>${user.phone}</td>
+<td>${user.address}</td>
+<td>${user.buildingType}</td>
+<td>${user.userType}</td>
+</tr>
+`;
+
+usersTableBody.innerHTML += row;
+
+});
+
+}
+
+// LOAD PAYMENTS
+const paymentsTableBody = document.getElementById("paymentsTableBody");
+
+if (paymentsTableBody) {
+
+  let payments = JSON.parse(localStorage.getItem("payments")) || [];
+
+  paymentsTableBody.innerHTML = "";
+
+  payments.forEach(pay => {
+
+    let row = `
+    <tr>
+      <td>${pay.name}</td>
+      <td>${pay.email}</td>
+      <td>${pay.amount}</td>
+      <td>${pay.status}</td>
+      <td>${pay.date}</td>
+    </tr>
+    `;
+    paymentsTableBody.innerHTML += row;
+  });
+}
+
+// LOAD PAYMENTS
+const paymentsTableBody = document.getElementById("paymentsTableBody");
+
+if (paymentsTableBody) {
+
+  let payments = JSON.parse(localStorage.getItem("payments")) || [];
+
+  paymentsTableBody.innerHTML = "";
+
+  payments.forEach(pay => {
+
+    let row = `
+    <tr>
+      <td>${pay.name}</td>
+      <td>${pay.email}</td>
+      <td>${pay.amount}</td>
+      <td>${pay.status}</td>
+      <td>${pay.date}</td>
+    </tr>
+    `;
+
+    paymentsTableBody.innerHTML += row;
+  });
+}
+
 fetch("/api/payments")

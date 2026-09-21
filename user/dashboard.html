@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="author" content="Uche Okike">
+    <meta name="description" content="AbiaCleanCity - Smart Waste Management">
+    <title>AbiaCleanCity - User Dashboard</title>
+    <link rel="icon" href="favicon.ico" type="image/x-icon">
+    <link rel="stylesheet" href="user.css">
+
+</head>
+
+<body>
+
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <h2>CleanCity</h2>
+        <ul>
+            <li onclick="showSection('profile')">Profile</li>
+            <li onclick="showSection('payment')">Payments</li>
+            <li onclick="showSection('report')">Report Waste</li>
+            <li onclick="showSection('recycle')">Sell Recyclables</li>
+        </ul>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main">
+
+        <!-- Topbar -->
+        <div class="topbar">
+            <h3>User Dashboard</h3>
+            <button id="logoutBtn" onclick="logout()">Logout</button>
+        </div>
+
+        <!-- PROFILE -->
+        <div id="profile" class="section active">
+            <h2>Your Profile</h2>
+            <p><strong>Name:</strong> <span id="userName"></span></p>
+            <p><strong>Email:</strong> <span id="email"></span></p>
+            <p><strong>Phone:</strong> <span id="phone"></span></p>
+            <p><strong>Address:</strong> <span id="userAddress"></span></p>
+            <p><strong>Building:</strong> <span id="building"></span></p>
+            <p><strong>User Type:</strong> <span id="userType"></span></p>
+        </div>
+
+        <!-- PAYMENT -->
+        <div id="payment" class="section">
+            <h2>Payment</h2>
+        
+            <p>Status: <span id="paymentStatus">Not Paid</span></p>
+        
+            <button onclick="openPaymentModal()">Pay Now</button>
+        
+            <!-- PAYMENT MODAL -->
+            <div id="paymentModal" class="modal">
+                <div class="modal-content">
+                    <h3>Pay Waste Levy</h3>
+        
+                    <p>Amount: ₦5,000</p>
+        
+                    <input type="text" placeholder="Card Number">
+                    <input type="text" placeholder="Expiry Date">
+                    <input type="text" placeholder="CVV">
+        
+                    <button onclick="confirmPayment()">Confirm Payment</button>
+                    <button onclick="closeModal()">Cancel</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- REPORT -->
+        <div id="report" class="section">
+            <h2>Report Waste Issue</h2>
+            <textarea id="issue" placeholder="Describe issue..."></textarea>
+            <button onclick="submitIssue()">Submit</button>
+        </div>
+
+        <!-- RECYCLE -->
+        <div id="recycle" class="section">
+            <h2>Sell Recyclable Waste</h2>
+            <input type="text" id="item" placeholder="Item (e.g. plastic)">
+            <input type="number" id="quantity" placeholder="Quantity">
+            <button onclick="sellItem()">Submit</button>
+        </div>
+
+    </div>
+
+    <script src="user/dashboard.js"></script>
+</body>
+
+</html>

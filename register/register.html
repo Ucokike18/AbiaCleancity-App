@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Create Account | AbiaCleanCity</title>
+
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+
+<body>
+
+    <main class="registration-page">
+
+        <section class="registration-container">
+
+            <!-- HEADER -->
+            <div class="registration-header">
+
+                <a href="../index.html" class="registration-logo">
+                    AbiaCleanCity
+                </a>
+
+                <h1>Create Your Account</h1>
+
+                <p>
+                    Join AbiaCleanCity and manage your waste services easily.
+                </p>
+
+            </div>
+
+
+            <!-- PROGRESS -->
+            <div class="registration-progress">
+
+                <div class="progress-step active" id="progressStep1">
+                    <span>1</span>
+                    <p>Account</p>
+                </div>
+
+                <div class="progress-line" id="progressLine"></div>
+
+                <div class="progress-step" id="progressStep2">
+                    <span>2</span>
+                    <p>Residence</p>
+                </div>
+
+            </div>
+
+
+            <!-- ERROR MESSAGE -->
+            <div class="registration-error" id="errorMsg" role="alert" aria-live="polite">
+            </div>
+
+
+            <!-- ==========================
+                 STEP 1
+            =========================== -->
+
+            <form id="registerForm" class="registration-form">
+
+                <div class="registration-step active" id="step1">
+
+                    <div class="step-heading">
+                        <h2>Account Information</h2>
+
+                        <p>
+                            Enter your basic information to get started.
+                        </p>
+                    </div>
+
+
+                    <!-- NAME -->
+                    <div class="form-group">
+
+                        <label for="name">
+                            Full Name
+                        </label>
+
+                        <input type="text" id="name" name="name" placeholder="Enter your full name" autocomplete="name"
+                            required>
+
+                    </div>
+
+
+                    <!-- EMAIL -->
+                    <div class="form-group">
+
+                        <label for="email">
+                            Email Address
+                        </label>
+
+                        <input type="email" id="email" name="email" placeholder="Enter your email address"
+                            autocomplete="email" required>
+
+                    </div>
+
+
+                    <!-- PHONE -->
+                    <div class="form-group">
+
+                        <label for="phone">
+                            Phone Number
+                        </label>
+
+                        <input type="tel" id="phone" name="phone" placeholder="e.g. +234 801 234 5678"
+                            autocomplete="tel" required>
+
+                    </div>
+
+
+                    <!-- PASSWORD -->
+                    <div class="form-group">
+
+                        <label for="password">
+                            Password
+                        </label>
+
+                        <input type="password" id="password" name="password" placeholder="Create a password"
+                            autocomplete="new-password" required>
+
+                    </div>
+
+
+                    <!-- CONFIRM PASSWORD -->
+                    <div class="form-group">
+
+                        <label for="confirmPassword">
+                            Confirm Password
+                        </label>
+
+                        <input type="password" id="confirmPassword" name="confirmPassword"
+                            placeholder="Confirm your password" autocomplete="new-password" required>
+
+                    </div>
+
+
+                    <button type="button" class="registration-btn" id="continueBtn">
+
+                        Continue
+
+                    </button>
+
+                </div>
+
+
+                <!-- ==========================
+                     STEP 2
+                =========================== -->
+
+                <div class="registration-step" id="step2">
+
+                    <div class="step-heading">
+
+                        <h2>Residence Information</h2>
+
+                        <p>
+                            Tell us a little about your residence.
+                        </p>
+
+                    </div>
+
+
+                    <!-- ACCOUNT SUMMARY -->
+                    <div class="account-summary">
+
+                        <h3>Account Details</h3>
+
+                        <div class="summary-item">
+                            <span>Name</span>
+                            <strong id="previewName"></strong>
+                        </div>
+
+                        <div class="summary-item">
+                            <span>Email</span>
+                            <strong id="previewEmail"></strong>
+                        </div>
+
+                        <div class="summary-item">
+                            <span>Phone</span>
+                            <strong id="previewPhone"></strong>
+                        </div>
+
+                    </div>
+
+
+                    <!-- ADDRESS -->
+                    <div class="form-group">
+
+                        <label for="address">
+                            Residential Address
+                        </label>
+
+                        <textarea id="address" name="address" rows="3"
+                            placeholder="Enter your complete residential address" required></textarea>
+
+                    </div>
+
+
+                    <!-- BUILDING TYPE -->
+                    <div class="form-group">
+
+                        <label for="buildingType">
+                            Building Type
+                        </label>
+
+                        <select id="buildingType" name="buildingType" required>
+
+                            <option value="">
+                                Select building type
+                            </option>
+
+                            <option value="bungalow">
+                                Bungalow
+                            </option>
+
+                            <option value="duplex">
+                                Duplex
+                            </option>
+
+                            <option value="apartment">
+                                Apartment
+                            </option>
+
+                            <option value="flat">
+                                Flat
+                            </option>
+
+                            <option value="compound">
+                                Compound
+                            </option>
+
+                            <option value="other">
+                                Other
+                            </option>
+
+                        </select>
+
+                    </div>
+
+
+                    <!-- USER TYPE -->
+                    <div class="form-group">
+
+                        <label for="userType">
+                            I am a
+                        </label>
+
+                        <select id="userType" name="userType" required>
+
+                            <option value="">
+                                Select your resident type
+                            </option>
+
+                            <option value="landlord">
+                                Landlord
+                            </option>
+
+                            <option value="tenant">
+                                Tenant
+                            </option>
+
+                        </select>
+
+                    </div>
+
+
+                    <!-- BUTTONS -->
+                    <div class="registration-actions">
+
+                        <button type="button" class="registration-btn secondary" id="backButton">
+
+                            Back
+
+                        </button>
+
+                        <button type="submit" class="registration-btn">
+
+                            Create Account
+
+                        </button>
+
+                    </div>
+
+                </div>
+
+            </form>
+
+
+            <!-- LOGIN -->
+            <div class="registration-login">
+
+                <p>
+                    Already have an account?
+                    <a href="../login.html">Login</a>
+                </p>
+
+            </div>
+
+        </section>
+
+    </main>
+
+
+    <script src="../js/script.js"></script>
+
+</body>
+
+</html>

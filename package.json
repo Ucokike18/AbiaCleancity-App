@@ -1,0 +1,24 @@
+{
+  "name": "abiacleancity",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Ucokike18/AbiaCleancity-App.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/Ucokike18/AbiaCleancity-App/issues"
+  },
+  "homepage": "https://github.com/Ucokike18/AbiaCleancity-App#readme",
+  "dependencies": {
+    "dotenv": "^17.4.2"
+  }
+}

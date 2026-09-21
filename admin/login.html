@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,30 +8,59 @@
     <meta name="description" content="AbiaCleanCity - Smart Waste Management">
     <title>AbiaCleanCity - Admin Login</title>
     <link rel="icon" href="favicon.ico" type="image/x-icon">
-    <link rel="stylesheet" href="admin.css">
+    <link rel="stylesheet" href="login.css">
 </head>
 
 <body>
 
-    <div class="login-container">
+    <!-- HEADER -->
+    <header>
 
-        <h2>Admin Login</h2>
+        <h1>CleanCity Admin</h1>
 
-        <form id="loginForm">
+        <nav>
+            <a href="../index.html">Home</a>
+            <a href="../login.html">User Login</a>
+        </nav>
 
-            <label>Email</label>
-            <input type="email" required>
+    </header>
 
-            <label>Password</label>
-            <input type="password" required>
+    <!-- LOGIN SECTION -->
+    <section class="admin-login-wrapper">
 
-            <button type="submit">Login</button>
+        <div class="form-container">
 
-        </form>
+            <h2>Admin Login</h2>
 
-    </div>
+            <form id="adminLoginForm">
 
-    <script src="admin.js"></script>
+                <input 
+                    type="email" 
+                    id="adminEmail" 
+                    placeholder="Admin Email" 
+                    required
+                >
+
+                <input 
+                    type="password" 
+                    id="adminPassword" 
+                    placeholder="Password" 
+                    required
+                >
+
+                <button type="submit">Login</button>
+
+                <p class="back-home">
+                    <a href="../index.html">← Back to Home</a>
+                </p>
+
+            </form>
+
+        </div>
+
+    </section>
+
+    <script src="admin-login.js"></script>
 
 </body>
 
