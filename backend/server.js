@@ -1,5 +1,6 @@
 const express = require("express");
 const cors = require("cors");
+const mongoose = require("mongoose");
 require("dotenv").config();
 
 /* DATABASE CONNECTION */
@@ -11,7 +12,7 @@ const userRoutes = require("./routes/userRoutes");
 /* INITIALIZE EXPRESS */
 const app = express();
 
-/* CONNECT to DATABASE */
+/* CONNECT TO DATABASE */
 connectDB();
 
 /* MIDDLEWARE */
@@ -23,12 +24,20 @@ app.get("/", (req, res) => {
     res.send("CleanCity Backend Running...");
 });
 
+/* HEALTH CHECK */
+app.get("/api/health", (req, res) => {
+
+    const databaseConnected = mongoose.connection.readyState === 1;
+
+    res.status(databaseConnected ? 200 : 503).json({
+        server: "OK",
+        database: databaseConnected ? "Connected" : "Disconnected",
+        status: databaseConnected ? "Healthy" : "Unhealthy"
+    });
+});
+
 /* USER ROUTES */
 app.use("/api/users", userRoutes);
-
-app.get("/", (req, res) => {
-    res.send("CleanCity Backend Running...");
-});
 
 /* PORT */
 const PORT = process.env.PORT || 5000;
@@ -37,3 +46,4 @@ const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
 });
+
