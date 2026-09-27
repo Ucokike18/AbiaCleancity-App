@@ -181,10 +181,10 @@ function validateStep1() {
        PASSWORD
     ------------------------------------------------------ */
 
-    if (password.length < 6) {
+    if (password.length < 8) {
 
         showError(
-            "Password must contain at least 6 characters."
+            "Password must contain at least 8 characters."
         );
 
         return false;
@@ -298,7 +298,7 @@ if (backButton) {
 
 if (registerForm) {
 
-    registerForm.addEventListener("submit", function (event) {
+    registerForm.addEventListener("submit", async function (event) {
 
         event.preventDefault();
 
@@ -373,254 +373,114 @@ if (registerForm) {
 
 
         /* --------------------------------------------------
-           CHECK EXISTING USER
-        -------------------------------------------------- */
-
-        const existingUser =
-            localStorage.getItem(USER_DATA_KEY);
-
-        if (existingUser) {
-
-            try {
-
-                const user =
-                    JSON.parse(existingUser);
-
-                if (
-                    user.email &&
-                    user.email.toLowerCase() === email
-                ) {
-
-                    showError(
-                        "An account with this email already exists."
-                    );
-
-                    showStep1();
-
-                    return;
-                }
-
-            } catch (error) {
-
-                console.error(
-                    "Could not read existing user:",
-                    error
-                );
-
-            }
-        }
-
-
-        /* --------------------------------------------------
-           CREATE USER
+           PREPARE REGISTRATION DATA
         -------------------------------------------------- */
 
         const userData = {
 
-            id: Date.now(),
-
             name,
-
             email,
-
             phone,
-
-            password,
-
             address,
-
             buildingType,
-
             userType,
-
-            role: "resident",
-
-            createdAt:
-                new Date().toISOString(),
-
-            paymentStatus: "Pending",
-
-            notifications: [],
-
-            reports: [],
-
-            collectionSchedule: null
+            password
 
         };
 
 
         /* --------------------------------------------------
-           SAVE USER
+           DISABLE SUBMIT BUTTON
         -------------------------------------------------- */
 
-        localStorage.setItem(
-            USER_DATA_KEY,
-            JSON.stringify(userData)
-        );
-
-
-        /* --------------------------------------------------
-           SUCCESS
-        -------------------------------------------------- */
-
-        alert(
-            "Your AbiaCleanCity account has been created successfully."
-        );
-
-
-        /* --------------------------------------------------
-           LOGIN
-        -------------------------------------------------- */
-
-        window.location.href = "../login.html";
-
-    });
-
-}
-
-/* ==========================================================
-   LOGIN SYSTEM
-========================================================== */
-
-const loginForm = document.getElementById("loginForm");
-
-
-if (loginForm) {
-
-    loginForm.addEventListener("submit", function (event) {
-
-        event.preventDefault();
-
-
-        /* --------------------------------------------------
-           GET LOGIN DATA
-        -------------------------------------------------- */
-
-        const email = document
-            .getElementById("loginEmail")
-            .value
-            .trim()
-            .toLowerCase();
-
-        const password = document
-            .getElementById("loginPassword")
-            .value;
-
-
-        /* --------------------------------------------------
-           VALIDATE INPUT
-        -------------------------------------------------- */
-
-        if (!email || !password) {
-
-            alert("Please enter your email and password.");
-
-            return;
-        }
-
-
-        /* --------------------------------------------------
-           GET REGISTERED USER
-        -------------------------------------------------- */
-
-        const storedUser =
-            localStorage.getItem(USER_DATA_KEY);
-
-
-        if (!storedUser) {
-
-            alert(
-                "No account was found. Please create an account first."
+        const submitButton =
+            registerForm.querySelector(
+                'button[type="submit"]'
             );
 
-            return;
+        if (submitButton) {
+
+            submitButton.disabled = true;
+
+            submitButton.textContent =
+                "Creating Account...";
+
         }
 
 
         /* --------------------------------------------------
-           READ USER DATA
+           REGISTER WITH BACKEND
         -------------------------------------------------- */
-
-        let user;
 
         try {
 
-            user = JSON.parse(storedUser);
+            const response =
+                await registerUser(userData);
+
+
+            /* ----------------------------------------------
+               SAVE AUTHENTICATION TOKEN
+            ---------------------------------------------- */
+
+            localStorage.setItem(
+                "abiaCleanCityToken",
+                response.token
+            );
+
+
+            /* ----------------------------------------------
+               SAVE SAFE USER DATA
+            ---------------------------------------------- */
+
+            localStorage.setItem(
+                "abiaCleanCityCurrentUser",
+                JSON.stringify(response.user)
+            );
+
+
+            /* ----------------------------------------------
+               SUCCESS
+            ---------------------------------------------- */
+
+            alert(
+                "Your AbiaCleanCity account has been created successfully."
+            );
+
+
+            /* ----------------------------------------------
+               REDIRECT
+            ---------------------------------------------- */
+
+            window.location.href =
+                "../user/dashboard.html";
+
 
         } catch (error) {
 
             console.error(
-                "Could not read user data:",
+                "Registration failed:",
                 error
             );
 
-            alert(
-                "There was a problem reading your account. Please register again."
+            showError(
+                error.message ||
+                "Unable to create your account. Please try again."
             );
 
-            return;
+
+        } finally {
+
+            if (submitButton) {
+
+                submitButton.disabled = false;
+
+                submitButton.textContent =
+                    "Create Account";
+
+            }
+
         }
-
-
-        /* --------------------------------------------------
-           VERIFY EMAIL
-        -------------------------------------------------- */
-
-        if (
-            !user.email ||
-            user.email.toLowerCase() !== email
-        ) {
-
-            alert("Invalid email or password.");
-
-            return;
-        }
-
-
-        /* --------------------------------------------------
-           VERIFY PASSWORD
-        -------------------------------------------------- */
-
-        if (user.password !== password) {
-
-            alert("Invalid email or password.");
-
-            return;
-        }
-
-
-        /* --------------------------------------------------
-           SAVE CURRENT SESSION
-        -------------------------------------------------- */
-
-        localStorage.setItem(
-            "abiaCleanCityCurrentUser",
-            JSON.stringify({
-                id: user.id,
-                name: user.name,
-                email: user.email,
-                role: user.role
-            })
-        );
-
-
-        /* --------------------------------------------------
-           LOGIN SUCCESS
-        -------------------------------------------------- */
-
-        alert(
-            `Welcome back, ${user.name}!`
-        );
-
-
-        /* --------------------------------------------------
-           REDIRECT
-        -------------------------------------------------- */
-
-        window.location.href =
-            "user/dashboard.html";
 
     });
 
 }
-
