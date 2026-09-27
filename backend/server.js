@@ -16,8 +16,17 @@ const app = express();
 connectDB();
 
 /* MIDDLEWARE */
-app.use(cors());
+
+const allowedOrigin = process.env.FRONTEND_URL;
+
+app.use(
+    cors({
+        origin: allowedOrigin
+    })
+);
+
 app.use(express.json());
+
 
 /* TEST ROUTE */
 app.get("/", (req, res) => {
