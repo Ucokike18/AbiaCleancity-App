@@ -1,5 +1,6 @@
 const express = require("express");
 const cors = require("cors");
+const helmet = require("helmet");
 const mongoose = require("mongoose");
 require("dotenv").config();
 
@@ -18,6 +19,8 @@ connectDB();
 /* MIDDLEWARE */
 
 const allowedOrigin = process.env.FRONTEND_URL;
+
+app.use(helmet());
 
 app.use(
     cors({
