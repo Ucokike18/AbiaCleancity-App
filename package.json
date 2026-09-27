@@ -1,17 +1,24 @@
 {
-  "name": "abiacleancity",
+  "name": "abia-cleancity",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "description": "A web-based cleaning service platform for booking and managing professional cleaning services.",
+  "main": "index.html",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"No automated tests configured yet\""
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Ucokike18/AbiaCleancity-App.git"
+    "url": "https://github.com/Ucokike18/AbiaCleancity-App.git"
   },
-  "keywords": [],
-  "author": "",
+  "keywords": [
+    "cleaning-service",
+    "booking-platform",
+    "cleaning-management",
+    "web-application",
+    "javascript",
+    "nodejs"
+  ],
+  "author": "Uchenna Okike",
   "license": "ISC",
   "type": "commonjs",
   "bugs": {
