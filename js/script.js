@@ -484,3 +484,133 @@ if (registerForm) {
     });
 
 }
+
+/* ==========================================================
+   LOGIN
+========================================================== */
+
+const loginForm = document.getElementById("loginForm");
+
+if (loginForm) {
+
+    loginForm.addEventListener(
+        "submit",
+        async function (event) {
+
+            event.preventDefault();
+
+            const email = document
+                .getElementById("loginEmail")
+                .value
+                .trim()
+                .toLowerCase();
+
+            const password = document
+                .getElementById("loginPassword")
+                .value;
+
+            const loginError =
+                document.getElementById("loginError");
+
+            const submitButton =
+                loginForm.querySelector(
+                    'button[type="submit"]'
+                );
+
+
+            if (loginError) {
+                loginError.textContent = "";
+            }
+
+
+            if (!email || !password) {
+
+                if (loginError) {
+                    loginError.textContent =
+                        "Email and password are required.";
+                }
+
+                return;
+            }
+
+
+            if (submitButton) {
+
+                submitButton.disabled = true;
+
+                submitButton.textContent =
+                    "Logging in...";
+            }
+
+
+            try {
+
+                const response =
+                    await loginUser(
+                        email,
+                        password
+                    );
+
+
+                /*
+                    Store JWT
+                */
+
+                localStorage.setItem(
+                    "abiaCleanCityToken",
+                    response.token
+                );
+
+
+                /*
+                    Store safe user information
+                    returned by the backend.
+                */
+
+                localStorage.setItem(
+                    "abiaCleanCityCurrentUser",
+                    JSON.stringify(
+                        response.user
+                    )
+                );
+
+
+                /*
+                    Redirect authenticated user
+                    to dashboard.
+                */
+
+                window.location.href =
+                    "user/dashboard.html";
+
+
+            } catch (error) {
+
+                console.error(
+                    "Login failed:",
+                    error
+                );
+
+
+                if (loginError) {
+
+                    loginError.textContent =
+                        error.message ||
+                        "Unable to login. Please try again.";
+
+                }
+
+            } finally {
+
+                if (submitButton) {
+
+                    submitButton.disabled = false;
+
+                    submitButton.textContent =
+                        "Login";
+                }
+            }
+        }
+    );
+}
+

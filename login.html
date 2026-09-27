@@ -1,50 +1,109 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="author" content="Uche Okike">
-    <meta name="description" content="AbiaCleanCity - Smart Waste Management">
-    <title>AbiaCleanCity - Smart Waste Management</title>
-    <link rel="icon" href="favicon.ico" type="image/x-icon">
-    <link rel="stylesheet" href="css/style.css">
 
+    <meta
+        name="author"
+        content="Uche Okike"
+    >
+
+    <meta
+        name="description"
+        content="AbiaCleanCity - Smart Waste Management"
+    >
+
+    <title>AbiaCleanCity - Smart Waste Management</title>
+
+    <link
+        rel="icon"
+        href="favicon.ico"
+        type="image/x-icon"
+    >
+
+    <link
+        rel="stylesheet"
+        href="css/style.css"
+    >
 </head>
 
 <body>
 
     <header>
+
         <h1>CleanCity</h1>
+
         <nav>
             <a href="index.html">Home</a>
             <a href="register.html">Register</a>
         </nav>
+
     </header>
+
 
     <section class="form-container">
 
         <h2>Login</h2>
 
-        <form id="loginForm" autocomplete="off">
+        <form
+            id="loginForm"
+            autocomplete="off"
+        >
 
-            <label>Email</label>
-            <input type="email" id="loginEmail" required>
+            <label for="loginEmail">
+                Email
+            </label>
 
-            <label>Password</label>
-            <input type="password" id="loginPassword" required >
+            <input
+                type="email"
+                id="loginEmail"
+                required
+                autocomplete="email"
+            >
 
-            <button type="submit">Login</button>
+
+            <label for="loginPassword">
+                Password
+            </label>
+
+            <input
+                type="password"
+                id="loginPassword"
+                required
+                autocomplete="current-password"
+            >
+
+
+            <button type="submit">
+                Login
+            </button>
 
         </form>
 
+        <p
+            id="loginError"
+            class="error-message"
+            aria-live="polite"
+        ></p>
+
     </section>
 
-<p class="back-home">
-    <a href="index.html">← Back to Home</a>
-</p>
 
-<script src="js/script.js"></script>
+    <p class="back-home">
+        <a href="index.html">
+            ← Back to Home
+        </a>
+    </p>
+
+
+    <!-- API -->
+    <script src="js/api.js"></script>
+
+    <!-- Application JavaScript -->
+    <script src="js/script.js"></script>
+
 </body>
 
 </html>

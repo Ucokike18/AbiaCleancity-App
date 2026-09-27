@@ -15,44 +15,88 @@ let user = null;
    SESSION
 ========================================================= */
 
+const TOKEN_KEY = "abiaCleanCityToken";
+
 function redirectToLogin() {
     window.location.href = "../login.html";
 }
 
-function loadUserSession() {
-    const currentUserData = localStorage.getItem(CURRENT_USER_KEY);
-    const storedUserData = localStorage.getItem(USER_DATA_KEY);
+async function loadUserSession() {
 
-    if (!currentUserData || !storedUserData) {
+    const token =
+        localStorage.getItem(TOKEN_KEY);
+
+    if (!token) {
         redirectToLogin();
         return false;
     }
 
     try {
-        currentUser = JSON.parse(currentUserData);
-        user = JSON.parse(storedUserData);
+
+        const response =
+            await getUserProfile(token);
+
+        if (
+            !response ||
+            !response.user
+        ) {
+            throw new Error(
+                "Unable to retrieve user profile."
+            );
+        }
+
+        user = response.user;
+
+        /*
+            Keep the authenticated user
+            available to the existing
+            dashboard UI.
+        */
+
+        currentUser = {
+            id: user._id || user.id,
+            name: user.name,
+            email: user.email,
+            role: user.userType
+        };
+
+        /*
+            Store only the safe user information
+            needed by the frontend session.
+        */
+
+        localStorage.setItem(
+            CURRENT_USER_KEY,
+            JSON.stringify(currentUser)
+        );
+
+        return true;
+
     } catch (error) {
-        console.error("Unable to read user session:", error);
 
-        localStorage.removeItem(CURRENT_USER_KEY);
+        console.error(
+            "Unable to load authenticated user:",
+            error
+        );
+
+        /*
+            The token may be expired,
+            invalid, or the user may
+            no longer exist.
+        */
+
+        localStorage.removeItem(
+            TOKEN_KEY
+        );
+
+        localStorage.removeItem(
+            CURRENT_USER_KEY
+        );
 
         redirectToLogin();
+
         return false;
     }
-
-    if (
-        !currentUser ||
-        typeof currentUser !== "object" ||
-        !user ||
-        typeof user !== "object"
-    ) {
-        localStorage.removeItem(CURRENT_USER_KEY);
-
-        redirectToLogin();
-        return false;
-    }
-
-    return true;
 }
 
 
@@ -2018,8 +2062,12 @@ window.addEventListener(
    INITIALIZE
 ========================================================= */
 
-function initializeDashboard() {
-    if (!loadUserSession()) {
+async function initializeDashboard() {
+
+    const authenticated =
+        await loadUserSession();
+
+    if (!authenticated) {
         return;
     }
 
