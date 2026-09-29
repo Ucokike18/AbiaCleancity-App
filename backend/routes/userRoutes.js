@@ -1,5 +1,5 @@
+const rateLimit = require("express-rate-limit");
 const protect = require("../middleware/authMiddleware");
-
 const express = require("express");
 
 const router = express.Router();
@@ -10,15 +10,41 @@ const {
     getUserProfile
 } = require("../controllers/userController");
 
+/* AUTHENTICATION RATE LIMITER */
+
+const authLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000,
+    limit: 20,
+    standardHeaders: "draft-8",
+    legacyHeaders: false,
+    message: {
+        success: false,
+        message: "Too many authentication attempts. Please try again later."
+    }
+});
+
 /* REGISTER */
 
-router.post("/register", registerUser);
+router.post(
+    "/register",
+    authLimiter,
+    registerUser
+);
 
 /* LOGIN */
 
-/* PROTECTED PROFILE */
-router.get("/profile", protect, getUserProfile);
+router.post(
+    "/login",
+    authLimiter,
+    loginUser
+);
 
-router.post("/login", loginUser);
+/* PROTECTED PROFILE */
+
+router.get(
+    "/profile",
+    protect,
+    getUserProfile
+);
 
 module.exports = router;
