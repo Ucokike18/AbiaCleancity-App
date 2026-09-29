@@ -10,6 +10,12 @@ const {
     getUserProfile
 } = require("../controllers/userController");
 
+const {
+    registerValidation,
+    loginValidation,
+    handleValidationErrors
+} = require("../middleware/validationMiddleware");
+
 /* AUTHENTICATION RATE LIMITER */
 
 const authLimiter = rateLimit({
@@ -28,6 +34,8 @@ const authLimiter = rateLimit({
 router.post(
     "/register",
     authLimiter,
+    registerValidation,
+    handleValidationErrors,
     registerUser
 );
 
@@ -36,6 +44,8 @@ router.post(
 router.post(
     "/login",
     authLimiter,
+    loginValidation,
+    handleValidationErrors,
     loginUser
 );
 
