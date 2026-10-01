@@ -5,6 +5,21 @@ const rateLimit = require("express-rate-limit");
 const mongoose = require("mongoose");
 require("dotenv").config();
 
+/* REQUIRED ENVIRONMENT VARIABLES */
+
+const requiredEnvVariables = [
+    "MONGO_URI",
+    "JWT_SECRET",
+    "FRONTEND_URL"
+];
+
+for (const variable of requiredEnvVariables) {
+    if (!process.env[variable]) {
+        console.error(`Missing required environment variable: ${variable}`);
+        process.exit(1);
+    }
+}
+
 /* DATABASE CONNECTION */
 const connectDB = require("./config/db");
 
@@ -13,6 +28,10 @@ const userRoutes = require("./routes/userRoutes");
 
 /* INITIALIZE EXPRESS */
 const app = express();
+
+/* SECURITY */
+
+app.disable("x-powered-by");
 
 /* RATE LIMITING */
 
@@ -38,6 +57,11 @@ const authLimiter = rateLimit({
     }
 });
 
+const {
+    notFound,
+    errorHandler
+} = require("./middleware/errorMiddleware");
+
 /* CONNECT TO DATABASE */
 connectDB();
 
@@ -53,7 +77,11 @@ app.use(
     })
 );
 
-app.use(express.json());
+app.use(
+    express.json({
+        limit: "10kb"
+    })
+);
 
 
 /* TEST ROUTE */
@@ -77,6 +105,12 @@ app.get("/api/health", (req, res) => {
 app.use("/api", apiLimiter);
 
 app.use("/api/users", userRoutes);
+
+/* ERROR HANDLING */
+
+app.use(notFound);
+
+app.use(errorHandler);
 
 /* PORT */
 const PORT = process.env.PORT || 5000;

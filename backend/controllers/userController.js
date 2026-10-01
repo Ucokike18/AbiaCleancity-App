@@ -1,6 +1,9 @@
 const User = require("../models/user");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
+const {
+    successResponse
+} = require("../utils/apiResponse");
 
 /* =========================
    GENERATE JWT TOKEN
@@ -211,24 +214,31 @@ const loginUser = async (req, res) => {
 /* =========================
    GET USER PROFILE
 ========================= */
-
 const getUserProfile = async (req, res) => {
+
     try {
-        return res.status(200).json({
-            success: true,
-            user: req.user
-        });
+
+        return successResponse(
+            res,
+            200,
+            "Profile retrieved successfully.",
+            {
+                user: req.user
+            }
+        );
 
     } catch (error) {
+
         console.error("Profile error:", error);
 
         return res.status(500).json({
             success: false,
             message: "Unable to retrieve profile"
         });
-    }
-};
 
+    }
+
+};
 /* =========================
    EXPORT CONTROLLERS
 ========================= */

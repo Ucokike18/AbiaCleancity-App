@@ -23,6 +23,7 @@ const handleValidationErrors = (req, res, next) => {
     next();
 };
 
+
 /* REGISTER VALIDATION */
 
 const registerValidation = [
@@ -62,7 +63,9 @@ const registerValidation = [
     body("userType")
         .trim()
         .notEmpty()
-        .withMessage("User type is required."),
+        .withMessage("User type is required.")
+        .isIn(["landlord", "tenant"])
+        .withMessage("User type must be either landlord or tenant."),
 
     body("password")
         .isString()
@@ -71,6 +74,7 @@ const registerValidation = [
         .withMessage("Password must be between 8 and 128 characters.")
 
 ];
+
 
 /* LOGIN VALIDATION */
 
@@ -88,6 +92,7 @@ const loginValidation = [
         .withMessage("Password is required.")
 
 ];
+
 
 module.exports = {
     registerValidation,
