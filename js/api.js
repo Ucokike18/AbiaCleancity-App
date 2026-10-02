@@ -19,25 +19,53 @@ async function apiRequest(endpoint, options = {}) {
             }
         );
 
-        const data = await response.json();
+        const contentType =
+            response.headers.get("content-type") || "";
+
+        let data = {};
+
+        if (contentType.includes("application/json")) {
+            data = await response.json();
+        } else {
+            const text = await response.text();
+
+            if (text) {
+                data = {
+                    message: text
+                };
+            }
+        }
 
         if (!response.ok) {
 
-            throw new Error(
+            const error = new Error(
                 data.message || "Something went wrong."
             );
+
+            error.status = response.status;
+            error.data = data;
+
+            throw error;
         }
 
         return data;
 
     } catch (error) {
 
+        if (error instanceof TypeError) {
+
+            console.error("Network error:", error);
+
+            throw new Error(
+                "Unable to connect to the server. Please try again."
+            );
+        }
+
         console.error("API request error:", error);
 
         throw error;
     }
 }
-
 
 /* =========================
    REGISTER USER
