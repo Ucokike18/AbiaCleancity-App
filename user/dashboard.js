@@ -4,27 +4,32 @@
    dashboard.js
 ========================================================= */
 
-const USER_DATA_KEY = "abiaCleanCityUser";
+const DASHBOARD_DATA_KEY = "abiaCleanCityDashboardData";
 const CURRENT_USER_KEY = "abiaCleanCityCurrentUser";
+const TOKEN_KEY = "abiaCleanCityToken";
 
 let currentUser = null;
 let user = null;
+
+function getDashboardDataKey() {
+    const userId = user?._id || user?.id || user?.email;
+
+    return userId
+        ? `${DASHBOARD_DATA_KEY}_${userId}`
+        : DASHBOARD_DATA_KEY;
+}
 
 
 /* =========================================================
    SESSION
 ========================================================= */
 
-const TOKEN_KEY = "abiaCleanCityToken";
-
 function redirectToLogin() {
     window.location.href = "../login.html";
 }
 
 async function loadUserSession() {
-
-    const token =
-        localStorage.getItem(TOKEN_KEY);
+    const token = localStorage.getItem(TOKEN_KEY);
 
     if (!token) {
         redirectToLogin();
@@ -32,14 +37,9 @@ async function loadUserSession() {
     }
 
     try {
+        const response = await getUserProfile(token);
 
-        const response =
-            await getUserProfile(token);
-
-        if (
-            !response ||
-            !response.user
-        ) {
+        if (!response || !response.user) {
             throw new Error(
                 "Unable to retrieve user profile."
             );
@@ -47,23 +47,12 @@ async function loadUserSession() {
 
         user = response.user;
 
-        /*
-            Keep the authenticated user
-            available to the existing
-            dashboard UI.
-        */
-
         currentUser = {
             id: user._id || user.id,
             name: user.name,
             email: user.email,
             role: user.userType
         };
-
-        /*
-            Store only the safe user information
-            needed by the frontend session.
-        */
 
         localStorage.setItem(
             CURRENT_USER_KEY,
@@ -73,25 +62,13 @@ async function loadUserSession() {
         return true;
 
     } catch (error) {
-
         console.error(
             "Unable to load authenticated user:",
             error
         );
 
-        /*
-            The token may be expired,
-            invalid, or the user may
-            no longer exist.
-        */
-
-        localStorage.removeItem(
-            TOKEN_KEY
-        );
-
-        localStorage.removeItem(
-            CURRENT_USER_KEY
-        );
+        localStorage.removeItem(TOKEN_KEY);
+        localStorage.removeItem(CURRENT_USER_KEY);
 
         redirectToLogin();
 
@@ -105,48 +82,92 @@ async function loadUserSession() {
 ========================================================= */
 
 function initializeUserData() {
-    let changed = false;
+    let dashboardData = {};
 
-    if (!Array.isArray(user.reports)) {
-        user.reports = [];
-        changed = true;
+    try {
+        const savedData = localStorage.getItem(
+            getDashboardDataKey()
+        );
+
+        if (savedData) {
+            dashboardData = JSON.parse(savedData) || {};
+        }
+
+    } catch (error) {
+        console.error(
+            "Unable to load dashboard data:",
+            error
+        );
     }
 
-    if (!Array.isArray(user.recyclingRequests)) {
-        user.recyclingRequests = [];
-        changed = true;
+    if (!Array.isArray(dashboardData.reports)) {
+        dashboardData.reports = [];
     }
 
-    if (!Array.isArray(user.notifications)) {
-        user.notifications = [];
-        changed = true;
+    if (!Array.isArray(dashboardData.recyclingRequests)) {
+        dashboardData.recyclingRequests = [];
     }
 
-    if (!user.collectionSchedule) {
-        user.collectionSchedule = {
+    if (!Array.isArray(dashboardData.notifications)) {
+        dashboardData.notifications = [];
+    }
+
+    if (!dashboardData.collectionSchedule) {
+        dashboardData.collectionSchedule = {
             date: getDefaultCollectionDate(),
             time: "8:00 AM - 12:00 PM",
             status: "Scheduled"
         };
-
-        changed = true;
     }
 
-    if (changed) {
-        saveUser();
-    }
+    user = {
+        ...user,
+        reports: dashboardData.reports,
+        recyclingRequests: dashboardData.recyclingRequests,
+        notifications: dashboardData.notifications,
+        collectionSchedule: dashboardData.collectionSchedule
+    };
+
+    saveUser();
 }
 
 function saveUser() {
+    if (!user) {
+        return false;
+    }
+
+    const dashboardData = {
+        reports: Array.isArray(user.reports)
+            ? user.reports
+            : [],
+
+        recyclingRequests: Array.isArray(
+            user.recyclingRequests
+        )
+            ? user.recyclingRequests
+            : [],
+
+        notifications: Array.isArray(user.notifications)
+            ? user.notifications
+            : [],
+
+        collectionSchedule:
+            user.collectionSchedule || null
+    };
+
     try {
         localStorage.setItem(
-            USER_DATA_KEY,
-            JSON.stringify(user)
+            getDashboardDataKey(),
+            JSON.stringify(dashboardData)
         );
 
         return true;
+
     } catch (error) {
-        console.error("Unable to save user data:", error);
+        console.error(
+            "Unable to save dashboard data:",
+            error
+        );
 
         return false;
     }
@@ -157,27 +178,17 @@ function syncCurrentUserSession() {
         return;
     }
 
-    currentUser.name =
-        user.name ||
-        currentUser.name ||
-        "";
+    currentUser = {
+        id: user._id || user.id,
+        name: user.name,
+        email: user.email,
+        role: user.userType
+    };
 
-    currentUser.email =
-        user.email ||
-        currentUser.email ||
-        "";
-
-    try {
-        localStorage.setItem(
-            CURRENT_USER_KEY,
-            JSON.stringify(currentUser)
-        );
-    } catch (error) {
-        console.error(
-            "Unable to synchronize current user session:",
-            error
-        );
-    }
+    localStorage.setItem(
+        CURRENT_USER_KEY,
+        JSON.stringify(currentUser)
+    );
 }
 
 function getDefaultCollectionDate() {
@@ -220,10 +231,6 @@ function displayUserInformation() {
         "welcomeName",
         getFirstName(name)
     );
-
-    /*
-        Header/profile initials
-    */
 
     setText(
         "avatarInitial",
@@ -847,10 +854,6 @@ function renderNotifications() {
                 : "hidden";
     }
 
-    /*
-        Empty notification state
-    */
-
     if (notifications.length === 0) {
         list.innerHTML = `
             <div class="notification-empty">
@@ -1243,11 +1246,13 @@ function confirmPayment() {
         Frontend demonstration only.
         No real payment is processed.
         Card information is never stored.
+
+        Payment status is intentionally kept
+        as a temporary frontend demonstration.
+        It is not persisted to MongoDB.
     */
 
     user.paymentStatus = "Paid";
-
-    saveUser();
 
     setText(
         "paymentStatus",
@@ -1325,12 +1330,6 @@ function submitIssue() {
     issueInput.value = "";
 
     updateDashboardOverview();
-
-    /*
-        Add an unread notification so the
-        header bell immediately reflects
-        the new activity.
-    */
 
     addNotification({
         title:
@@ -1627,31 +1626,22 @@ function saveProfileChanges(event) {
         return;
     }
 
-    user.name =
-        name;
+    /*
+        The current backend exposes GET /profile
+        but does not yet expose a profile update
+        endpoint.
 
-    user.email =
-        email;
+        Therefore these changes are applied to the
+        current frontend session only. They are not
+        written to MongoDB.
+    */
 
-    user.phone =
-        phone;
-
-    user.address =
-        address;
-
-    user.buildingType =
-        buildingType;
-
-    user.userType =
-        userType;
-
-    if (!saveUser()) {
-        alert(
-            "Unable to save your profile changes. Please try again."
-        );
-
-        return;
-    }
+    user.name = name;
+    user.email = email;
+    user.phone = phone;
+    user.address = address;
+    user.buildingType = buildingType;
+    user.userType = userType;
 
     syncCurrentUserSession();
 
@@ -1662,7 +1652,7 @@ function saveProfileChanges(event) {
     cancelProfileEditing();
 
     alert(
-        "Your profile has been updated successfully."
+        "Your profile has been updated for this session."
     );
 }
 
@@ -1724,8 +1714,19 @@ function logout() {
     }
 
     localStorage.removeItem(
+        TOKEN_KEY
+    );
+
+    localStorage.removeItem(
         CURRENT_USER_KEY
     );
+
+    localStorage.removeItem(
+        "abiaCleanCityUser"
+    );
+
+    currentUser = null;
+    user = null;
 
     window.location.href =
         "../login.html";
@@ -2063,7 +2064,6 @@ window.addEventListener(
 ========================================================= */
 
 async function initializeDashboard() {
-
     const authenticated =
         await loadUserSession();
 
