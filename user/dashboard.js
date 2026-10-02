@@ -67,11 +67,23 @@ async function loadUserSession() {
             error
         );
 
-        localStorage.removeItem(TOKEN_KEY);
-        localStorage.removeItem(CURRENT_USER_KEY);
+        /*
+         * Only clear the session when the backend
+         * explicitly reports an authentication failure.
+         */
+        if (error.status === 401 || error.status === 403) {
+            localStorage.removeItem(TOKEN_KEY);
+            localStorage.removeItem(CURRENT_USER_KEY);
 
-        redirectToLogin();
+            redirectToLogin();
+            return false;
+        }
 
+        /*
+         * For network/server errors, keep the existing
+         * authentication session instead of logging the
+         * user out.
+         */
         return false;
     }
 }
