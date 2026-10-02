@@ -1,4 +1,4 @@
-const BASE_URL = "http://localhost:5000/api/users";
+const BASE_URL = API_BASE_URL;
 
 /* =========================
    API REQUEST HELPER
