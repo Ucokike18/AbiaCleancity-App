@@ -1,3 +1,50 @@
+/* =========================================================
+   ADMIN AUTHENTICATION GUARD
+========================================================= */
+
+const ADMIN_TOKEN_KEY = "abiaCleanCityToken";
+const ADMIN_USER_KEY = "abiaCleanCityCurrentUser";
+
+async function verifyAdminSession() {
+    const token = localStorage.getItem(ADMIN_TOKEN_KEY);
+    const storedUser = localStorage.getItem(ADMIN_USER_KEY);
+
+    if (!token || !storedUser) {
+        window.location.href = "login.html";
+        return false;
+    }
+
+    try {
+        const response = await getUserProfile(token);
+
+        if (!response || !response.user) {
+            throw new Error("Invalid session.");
+        }
+
+        const userType =
+            String(response.user.userType)
+                .trim()
+                .toLowerCase();
+
+        if (userType !== "admin") {
+            throw new Error("Admin access required.");
+        }
+
+        return true;
+
+    } catch (error) {
+        console.error("Admin session verification failed:", error);
+
+        localStorage.removeItem(ADMIN_TOKEN_KEY);
+        localStorage.removeItem(ADMIN_USER_KEY);
+
+        window.location.href = "login.html";
+        return false;
+    }
+}
+
+verifyAdminSession();
+
 const form = document.getElementById("loginForm");
 
 if (form) {
@@ -145,29 +192,5 @@ if (paymentsTableBody) {
   });
 }
 
-// LOAD PAYMENTS
-const paymentsTableBody = document.getElementById("paymentsTableBody");
-
-if (paymentsTableBody) {
-
-  let payments = JSON.parse(localStorage.getItem("payments")) || [];
-
-  paymentsTableBody.innerHTML = "";
-
-  payments.forEach(pay => {
-
-    let row = `
-    <tr>
-      <td>${pay.name}</td>
-      <td>${pay.email}</td>
-      <td>${pay.amount}</td>
-      <td>${pay.status}</td>
-      <td>${pay.date}</td>
-    </tr>
-    `;
-
-    paymentsTableBody.innerHTML += row;
-  });
-}
 
 fetch("/api/payments")
