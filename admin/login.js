@@ -1,28 +1,50 @@
-const loginForm = document.getElementById("loginForm");
+const loginForm = document.getElementById("adminLoginForm");
 
 if (loginForm) {
-  loginForm.addEventListener("submit", function (e) {
-    e.preventDefault();
+    loginForm.addEventListener("submit", async function (e) {
+        e.preventDefault();
 
-    const email = document.getElementById("loginEmail").value.trim();
-    const password = document.getElementById("loginPassword").value.trim();
+        const email =
+            document.getElementById("adminEmail").value.trim();
 
-    let users = JSON.parse(localStorage.getItem("users")) || [];
+        const password =
+            document.getElementById("adminPassword").value.trim();
 
-    console.log("Users:", users); // DEBUG
-    console.log("Entered:", email, password); // DEBUG
+        try {
+            const response = await loginUser(email, password);
 
-    let user = users.find(u => 
-      u.email.trim() === email && u.password === password
-    );
+            if (!response || !response.token || !response.user) {
+                throw new Error("Invalid login response.");
+            }
 
-    if (!user) {
-      alert("Invalid email or password");
-      return;
-    }
+            if (
+                String(response.user.userType).trim().toLowerCase() !==
+                "admin"
+            ) {
+                throw new Error(
+                    "Access denied. Admin account required."
+                );
+            }
 
-    localStorage.setItem("currentUser", JSON.stringify(user));
+            localStorage.setItem(
+                "abiaCleanCityToken",
+                response.token
+            );
 
-    window.location.href = "user/dashboard.html";
-  });
+            localStorage.setItem(
+                "abiaCleanCityCurrentUser",
+                JSON.stringify(response.user)
+            );
+
+            window.location.href = "dashboard.html";
+
+        } catch (error) {
+            console.error("Admin login failed:", error);
+
+            alert(
+                error.message ||
+                "Unable to sign in. Please try again."
+            );
+        }
+    });
 }
