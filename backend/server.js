@@ -25,6 +25,7 @@ const connectDB = require("./config/db");
 
 /* ROUTES */
 const userRoutes = require("./routes/userRoutes");
+const paymentRoutes = require("./routes/paymentRoutes");
 
 /* INITIALIZE EXPRESS */
 const app = express();
@@ -83,7 +84,6 @@ app.use(
     })
 );
 
-
 /* TEST ROUTE */
 app.get("/", (req, res) => {
     res.send("CleanCity Backend Running...");
@@ -101,10 +101,11 @@ app.get("/api/health", (req, res) => {
     });
 });
 
-/* USER ROUTES */
+/* API ROUTES */
 app.use("/api", apiLimiter);
 
 app.use("/api/users", userRoutes);
+app.use("/api/payments", paymentRoutes);
 
 /* ERROR HANDLING */
 
@@ -119,4 +120,3 @@ const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
 });
-

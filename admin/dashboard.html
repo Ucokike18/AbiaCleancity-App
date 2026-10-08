@@ -48,17 +48,17 @@
 
                 <div class="card">
                     <h3>Total Users</h3>
-                    <p>120</p>
+                    <p id="totalUsers">0</p>
                 </div>
 
                 <div class="card">
                     <h3>Total Payments</h3>
-                    <p>₦250,000</p>
+                    <p id="totalPayments">₦0</p>
                 </div>
 
                 <div class="card">
                     <h3>Reports</h3>
-                    <p>35</p>
+                    <p id="totalReports">0</p>
                 </div>
 
             </div>
@@ -120,7 +120,8 @@
                     <select id="paymentFilter">
                         <option value="">All Payments</option>
                         <option value="Paid">Paid</option>
-                        <option value="Not Paid">Not Paid</option>
+                        <option value="Pending">Pending</option>
+                        <option value="Failed">Failed</option>
                     </select>
                 </div>
 
@@ -136,21 +137,7 @@
 
                     <tbody id="paymentsTableBody">
                         <tr>
-                            <td>John Doe</td>
-                            <td>₦1,000</td>
-                            <td class="paid">Paid</td>
-                        </tr>
-
-                        <tr>
-                            <td>Jane Smith</td>
-                            <td>₦1,000</td>
-                            <td class="not-paid">Not Paid</td>
-                        </tr>
-
-                        <tr>
-                            <td>Michael Obi</td>
-                            <td>₦1,000</td>
-                            <td class="paid">Paid</td>
+                            <td colspan="3">No payment records available.</td>
                         </tr>
                     </tbody>
 
@@ -166,7 +153,11 @@
                         </tr>
                     </thead>
 
-                    <tbody id="reportsTableBody"></tbody>
+                    <tbody id="reportsTableBody">
+                        <tr>
+                            <td colspan="2">No waste reports available.</td>
+                        </tr>
+                    </tbody>
                 </table>
 
             </div>
