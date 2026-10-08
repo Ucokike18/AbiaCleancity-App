@@ -45,25 +45,86 @@ async function verifyAdminSession() {
 
 verifyAdminSession();
 
-const form = document.getElementById("loginForm");
+/* =========================
+   LOAD ADMIN USERS
+========================= */
 
-if (form) {
-  form.addEventListener("submit", function (e) {
-    e.preventDefault();
+async function loadAdminUsers() {
 
-    // simple login simulation
-    window.location.href = "dashboard.html";
-  });
+    const usersTableBody = document.getElementById("usersTableBody");
+
+    if (!usersTableBody) {
+        return;
+    }
+
+    try {
+
+        const token = localStorage.getItem(ADMIN_TOKEN_KEY);
+
+        const response = await fetch(
+            `${API_BASE_URL}/admin/users`,
+            {
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
+            }
+        );
+
+        const data = await response.json();
+
+        if (!response.ok || !data.success) {
+            throw new Error(
+                data.message || "Unable to retrieve users."
+            );
+        }
+
+        const users = data.users || [];
+
+        if (users.length === 0) {
+            usersTableBody.innerHTML = `
+                <tr>
+                    <td colspan="7">No users found.</td>
+                </tr>
+            `;
+            return;
+        }
+
+        usersTableBody.innerHTML = users.map(user => `
+            <tr>
+                <td>${user.name || "-"}</td>
+                <td>${user.email || "-"}</td>
+                <td>${user.phone || "-"}</td>
+                <td>${user.address || "-"}</td>
+                <td>${user.buildingType || "-"}</td>
+                <td>${user.userType || "-"}</td>
+                <td>${user.paymentStatus || "Not Paid"}</td>
+            </tr>
+        `).join("");
+
+    } catch (error) {
+
+        console.error("Admin users error:", error);
+
+        usersTableBody.innerHTML = `
+            <tr>
+                <td colspan="7">Unable to load users.</td>
+            </tr>
+        `;
+    }
 }
+
+loadAdminUsers();
 
 // Logout Button
 const logoutBtn = document.getElementById("logoutBtn");
 
 if (logoutBtn) {
-  logoutBtn.addEventListener("click", () => {
-    alert("Logged out successfully");
-    window.location.href = "login.html";
-  });
+    logoutBtn.addEventListener("click", () => {
+        localStorage.removeItem(ADMIN_TOKEN_KEY);
+        localStorage.removeItem(ADMIN_USER_KEY);
+
+        window.location.href = "login.html";
+    });
 }
 
 // Charts
@@ -139,58 +200,3 @@ if (paymentFilter) {
     });
   });
 }
-
-// LOAD USERS INTO ADMIN TABLE
-const usersTableBody = document.getElementById("usersTableBody");
-
-if(usersTableBody){
-
-let users = JSON.parse(localStorage.getItem("users")) || [];
-
-usersTableBody.innerHTML = "";
-
-users.forEach(user => {
-
-let row = `
-<tr>
-<td>${user.name}</td>
-<td>${user.email}</td>
-<td>${user.phone}</td>
-<td>${user.address}</td>
-<td>${user.buildingType}</td>
-<td>${user.userType}</td>
-</tr>
-`;
-
-usersTableBody.innerHTML += row;
-
-});
-
-}
-
-// LOAD PAYMENTS
-const paymentsTableBody = document.getElementById("paymentsTableBody");
-
-if (paymentsTableBody) {
-
-  let payments = JSON.parse(localStorage.getItem("payments")) || [];
-
-  paymentsTableBody.innerHTML = "";
-
-  payments.forEach(pay => {
-
-    let row = `
-    <tr>
-      <td>${pay.name}</td>
-      <td>${pay.email}</td>
-      <td>${pay.amount}</td>
-      <td>${pay.status}</td>
-      <td>${pay.date}</td>
-    </tr>
-    `;
-    paymentsTableBody.innerHTML += row;
-  });
-}
-
-
-fetch("/api/payments")

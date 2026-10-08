@@ -25,7 +25,9 @@ const userSchema = new mongoose.Schema({
 
     buildingType:{
         type:String,
-        required:true
+        required: function () {
+            return this.userType !== "admin";
+        }
     },
 
     userType:{

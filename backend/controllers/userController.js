@@ -239,6 +239,44 @@ const getUserProfile = async (req, res) => {
     }
 
 };
+
+/* =========================
+   GET ADMIN USERS
+========================= */
+
+const getAdminUsers = async (req, res) => {
+    try {
+        const users = await User.find({
+            userType: {
+                $ne: "admin"
+            }
+        })
+            .select("-password")
+            .sort({
+                createdAt: -1
+            });
+
+        return successResponse(
+            res,
+            200,
+            "Users retrieved successfully.",
+            {
+                users
+            }
+        );
+
+    } catch (error) {
+
+        console.error("Admin users error:", error);
+
+        return res.status(500).json({
+            success: false,
+            message: "Unable to retrieve users"
+        });
+
+    }
+};
+
 /* =========================
    EXPORT CONTROLLERS
 ========================= */
@@ -246,5 +284,6 @@ const getUserProfile = async (req, res) => {
 module.exports = {
     registerUser,
     loginUser,
-    getUserProfile
+    getUserProfile,
+    getAdminUsers
 };

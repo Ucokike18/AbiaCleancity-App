@@ -80,57 +80,42 @@
 
             <!-- USERS TABLE -->
             <div class="table-section">
-            
+
                 <h3>Manage Users</h3>
-            
+
                 <div class="table-controls">
                     <input type="text" id="userSearch" placeholder="Search users...">
                 </div>
-            
-                <table id="usersTableBody">
-            
+
+                <table id="usersTable">
+
                     <thead>
                         <tr>
                             <th>Name</th>
                             <th>Email</th>
-                            <th>Location</th>
+                            <th>Phone</th>
                             <th>Address</th>
                             <th>Building</th>
                             <th>User Type</th>
+                            <th>Payment Status</th>
                         </tr>
                     </thead>
-            
-                    <tbody>
+
+                    <tbody id="usersTableBody">
                         <tr>
-                            <td>John Doe</td>
-                            <td>john@email.com</td>
-                            <td>Aba</td>
+                            <td colspan="7">Loading users...</td>
                         </tr>
-            
-                        <tr>
-                            <td>Jane Smith</td>
-                            <td>jane@email.com</td>
-                            <td>Umuahia</td>
-                        </tr>
-            
-                        <tr>
-                            <td>Michael Obi</td>
-                            <td>michael@email.com</td>
-                            <td>Aba South</td>
-                        </tr>
-            
                     </tbody>
-            
+
                 </table>
-            
+
             </div>
-            
-            
+
             <!-- PAYMENTS TABLE -->
             <div class="table-section">
-            
+
                 <h3>Payments</h3>
-            
+
                 <div class="table-controls">
                     <select id="paymentFilter">
                         <option value="">All Payments</option>
@@ -138,9 +123,9 @@
                         <option value="Not Paid">Not Paid</option>
                     </select>
                 </div>
-            
-                <table id="paymentsTableBody">
-            
+
+                <table id="paymentsTable">
+
                     <thead>
                         <tr>
                             <th>Name</th>
@@ -148,31 +133,31 @@
                             <th>Status</th>
                         </tr>
                     </thead>
-            
-                    <tbody id="usersTableBody">
+
+                    <tbody id="paymentsTableBody">
                         <tr>
                             <td>John Doe</td>
                             <td>₦1,000</td>
                             <td class="paid">Paid</td>
                         </tr>
-            
+
                         <tr>
                             <td>Jane Smith</td>
                             <td>₦1,000</td>
                             <td class="not-paid">Not Paid</td>
                         </tr>
-            
+
                         <tr>
                             <td>Michael Obi</td>
                             <td>₦1,000</td>
                             <td class="paid">Paid</td>
                         </tr>
-            
                     </tbody>
-            
+
                 </table>
+
                 <h2>Waste Reports</h2>
-                
+
                 <table>
                     <thead>
                         <tr>
@@ -180,20 +165,22 @@
                             <th>Date</th>
                         </tr>
                     </thead>
-                
+
                     <tbody id="reportsTableBody"></tbody>
                 </table>
-            
+
             </div>
-            
-            </div>
-            
-            </div>
-            
-            <!-- Chart.js CDN -->
+
+        </div>
+
+    </div>
+
+    <!-- Chart.js CDN -->
     <script src="../js/config.js"></script>
     <script src="../js/api.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="admin.js"></script>
 
 </body>
+
+</html>

@@ -1,5 +1,6 @@
 const rateLimit = require("express-rate-limit");
 const protect = require("../middleware/authMiddleware");
+const authorizeRoles = require("../middleware/roleMiddleware");
 const express = require("express");
 
 const router = express.Router();
@@ -7,7 +8,8 @@ const router = express.Router();
 const {
     registerUser,
     loginUser,
-    getUserProfile
+    getUserProfile,
+    getAdminUsers
 } = require("../controllers/userController");
 
 const {
@@ -55,6 +57,15 @@ router.get(
     "/profile",
     protect,
     getUserProfile
+);
+
+/* ADMIN USERS */
+
+router.get(
+    "/admin/users",
+    protect,
+    authorizeRoles("admin"),
+    getAdminUsers
 );
 
 module.exports = router;
