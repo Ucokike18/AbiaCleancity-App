@@ -209,6 +209,157 @@ loadAdminPayments();
 
 
 /* =========================
+   LOAD ADMIN WASTE REPORTS
+========================= */
+
+async function loadAdminReports() {
+    const reportsTableBody =
+        document.getElementById("reportsTableBody");
+
+    const totalReports =
+        document.getElementById("totalReports");
+
+    if (!reportsTableBody) {
+        return;
+    }
+
+    try {
+        const token = localStorage.getItem(ADMIN_TOKEN_KEY);
+
+        if (!token) {
+            throw new Error("Admin session token is missing.");
+        }
+
+        const response = await fetch(
+            `${API_ROOT}/reports/admin`,
+            {
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
+            }
+        );
+
+        const data = await response.json();
+
+        if (!response.ok || !data.success) {
+            throw new Error(
+                data.message || "Unable to retrieve waste reports."
+            );
+        }
+
+        const reports = Array.isArray(data.reports)
+            ? data.reports
+            : [];
+
+        if (totalReports) {
+            totalReports.textContent = reports.length;
+        }
+
+        if (reports.length === 0) {
+            reportsTableBody.innerHTML = `
+                <tr>
+                    <td colspan="2">No waste reports available.</td>
+                </tr>
+            `;
+
+            updateReportsChart([]);
+            return;
+        }
+
+        reportsTableBody.innerHTML = reports.map(report => {
+            const issue = escapeAdminHTML(report.issue || "-");
+
+            const date = report.createdAt
+                ? new Date(report.createdAt).toLocaleDateString()
+                : "-";
+
+            return `
+                <tr>
+                    <td>${issue}</td>
+                    <td>${date}</td>
+                </tr>
+            `;
+        }).join("");
+
+        updateReportsChart(reports);
+
+    } catch (error) {
+        console.error("Admin waste reports error:", error);
+
+        reportsTableBody.innerHTML = `
+            <tr>
+                <td colspan="2">Unable to load waste reports.</td>
+            </tr>
+        `;
+
+        updateReportsChart([]);
+
+    }
+}
+
+function escapeAdminHTML(value) {
+    return String(value).replace(/[&<>"']/g, character => ({
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        '"': "&quot;",
+        "'": "&#39;"
+    })[character]);
+}
+
+
+
+/* =========================
+   WASTE REPORTS CHART
+========================= */
+
+let reportsChart;
+
+function updateReportsChart(reports) {
+    const chartCanvas =
+        document.getElementById("reportsChart");
+
+    if (!chartCanvas || typeof Chart === "undefined") {
+        return;
+    }
+
+    const statuses = ["Pending", "In Progress", "Resolved"];
+
+    const statusCounts = statuses.map(status =>
+        reports.filter(report => report.status === status).length
+    );
+
+    if (reportsChart) {
+        reportsChart.destroy();
+    }
+
+    reportsChart = new Chart(chartCanvas, {
+        type: "doughnut",
+
+        data: {
+            labels: statuses,
+
+            datasets: [{
+                data: statusCounts
+            }]
+        },
+
+        options: {
+            responsive: true,
+
+            plugins: {
+                legend: {
+                    position: "bottom"
+                }
+            }
+        }
+    });
+}
+
+loadAdminReports();
+
+
+/* =========================
    LOAD PAYMENT SUMMARY
 ========================= */
 

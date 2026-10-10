@@ -90,6 +90,93 @@ async function loadUserSession() {
 
 
 /* =========================================================
+   WASTE REPORT API
+========================================================= */
+
+async function reportApiRequest(endpoint, options = {}) {
+    const token = localStorage.getItem(TOKEN_KEY);
+
+    if (!token) {
+        throw new Error("Your session has expired. Please log in again.");
+    }
+
+    const API_ROOT = API_BASE_URL.replace(/\/users\/?$/, "");
+
+    return apiRequestToURL(
+        `${API_ROOT}/reports${endpoint}`,
+        {
+            ...options,
+            headers: {
+                Authorization: `Bearer ${token}`,
+                ...(options.headers || {})
+            }
+        }
+    );
+}
+
+async function apiRequestToURL(url, options = {}) {
+    const response = await fetch(url, {
+        ...options,
+        headers: {
+            "Content-Type": "application/json",
+            ...(options.headers || {})
+        }
+    });
+
+    const contentType = response.headers.get("content-type") || "";
+    const data = contentType.includes("application/json")
+        ? await response.json()
+        : {};
+
+    if (!response.ok) {
+        const error = new Error(
+            data.message || "Unable to process the waste report request."
+        );
+
+        error.status = response.status;
+        error.data = data;
+
+        throw error;
+    }
+
+    return data;
+}
+
+
+
+async function loadMyReports() {
+    try {
+        const response = await reportApiRequest("/my");
+
+        if (!Array.isArray(response.reports)) {
+            throw new Error(
+                "The server returned an invalid waste reports response."
+            );
+        }
+
+        user.reports = response.reports;
+
+        return true;
+
+    } catch (error) {
+        console.error(
+            "Unable to load waste reports:",
+            error
+        );
+
+        // Preserve existing reports if the API request fails.
+        if (!Array.isArray(user.reports)) {
+            user.reports = [];
+        }
+
+        return false;
+    }
+}
+
+
+
+
+/* =========================================================
    USER DATA
 ========================================================= */
 
@@ -143,31 +230,42 @@ function initializeUserData() {
     saveUser();
 }
 
+
 function saveUser() {
     if (!user) {
         return false;
     }
 
-    const dashboardData = {
-        reports: Array.isArray(user.reports)
-            ? user.reports
-            : [],
-
-        recyclingRequests: Array.isArray(
-            user.recyclingRequests
-        )
-            ? user.recyclingRequests
-            : [],
-
-        notifications: Array.isArray(user.notifications)
-            ? user.notifications
-            : [],
-
-        collectionSchedule:
-            user.collectionSchedule || null
-    };
+    let dashboardData = {};
 
     try {
+        const savedData = localStorage.getItem(
+            getDashboardDataKey()
+        );
+
+        if (savedData) {
+            dashboardData = JSON.parse(savedData) || {};
+        }
+
+        // Keep legacy browser reports intact.
+        // Live waste reports will come from the backend.
+        dashboardData = {
+            ...dashboardData,
+
+            recyclingRequests: Array.isArray(
+                user.recyclingRequests
+            )
+                ? user.recyclingRequests
+                : [],
+
+            notifications: Array.isArray(user.notifications)
+                ? user.notifications
+                : [],
+
+            collectionSchedule:
+                user.collectionSchedule || null
+        };
+
         localStorage.setItem(
             getDashboardDataKey(),
             JSON.stringify(dashboardData)
@@ -1296,74 +1394,69 @@ function confirmPayment() {
    WASTE REPORT
 ========================================================= */
 
-function submitIssue() {
-    const issueInput =
-        document.getElementById(
-            "issue"
-        );
+
+async function submitIssue() {
+    const issueInput = document.getElementById("issue");
 
     if (!issueInput) {
         return;
     }
 
-    const issue =
-        issueInput.value.trim();
+    const issue = issueInput.value.trim();
 
     if (!issue) {
-        alert(
-            "Please describe the waste issue."
-        );
-
+        alert("Please describe the waste issue.");
         return;
     }
 
-    if (
-        !Array.isArray(
-            user.reports
-        )
-    ) {
-        user.reports = [];
+    try {
+        const response = await reportApiRequest("/", {
+            method: "POST",
+            body: JSON.stringify({ issue })
+        });
+
+        if (!response.report) {
+            throw new Error(
+                "The server did not return the submitted report."
+            );
+        }
+
+        // Use the report returned by MongoDB.
+        if (!Array.isArray(user.reports)) {
+            user.reports = [];
+        }
+
+        user.reports.unshift(response.report);
+
+        issueInput.value = "";
+
+        updateDashboardOverview();
+
+        addNotification({
+            title: "Waste report submitted",
+            message: "Your waste issue report has been received.",
+            type: "report"
+        });
+
+        alert("Your waste report has been submitted successfully.");
+
+        showSection(
+            "reports",
+            document.querySelector(
+                '.nav-item[onclick*="reports"]'
+            )
+        );
+
+    } catch (error) {
+        console.error("Waste report submission failed:", error);
+
+        alert(
+            error.message ||
+            "Unable to submit your waste report. Please try again."
+        );
     }
-
-    const report = {
-        id: Date.now(),
-        issue,
-        status: "Pending",
-        createdAt:
-            new Date().toISOString()
-    };
-
-    user.reports.push(
-        report
-    );
-
-    saveUser();
-
-    issueInput.value = "";
-
-    updateDashboardOverview();
-
-    addNotification({
-        title:
-            "Waste report submitted",
-
-        message:
-            "Your waste issue report has been received.",
-
-        type: "report"
-    });
-
-    alert(
-        "Your waste report has been submitted successfully."
-    );
-
-    showSection(
-        "reports",
-        document.querySelector(
-            '.nav-item[onclick*="reports"]'
-        )
-    );
 }
+
 
 
 /* =========================================================
@@ -2075,6 +2168,7 @@ window.addEventListener(
    INITIALIZE
 ========================================================= */
 
+
 async function initializeDashboard() {
     const authenticated =
         await loadUserSession();
@@ -2085,9 +2179,12 @@ async function initializeDashboard() {
 
     initializeUserData();
 
+    await loadMyReports();
+
     displayUserInformation();
 
     updateDashboardOverview();
 }
+
 
 initializeDashboard();

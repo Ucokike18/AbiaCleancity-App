@@ -3,6 +3,8 @@ const cors = require("cors");
 const helmet = require("helmet");
 const rateLimit = require("express-rate-limit");
 const mongoose = require("mongoose");
+const reportRoutes = require("./routes/reportRoutes");
+
 require("dotenv").config();
 
 /* REQUIRED ENVIRONMENT VARIABLES */
@@ -106,6 +108,7 @@ app.use("/api", apiLimiter);
 
 app.use("/api/users", userRoutes);
 app.use("/api/payments", paymentRoutes);
+app.use("/api/reports", reportRoutes);
 
 /* ERROR HANDLING */
 
