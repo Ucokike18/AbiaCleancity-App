@@ -1,4 +1,3 @@
-
 /* =========================================================
    ADMIN AUTHENTICATION AND API CONFIGURATION
 ========================================================= */
@@ -6,7 +5,7 @@
 const ADMIN_TOKEN_KEY = "abiaCleanCityToken";
 const ADMIN_USER_KEY = "abiaCleanCityCurrentUser";
 
-const API_ROOT = API_BASE_URL.replace(/\/users$/, "");
+const API_ROOT = API_BASE_URL.replace(/\/users\/?$/, "");
 
 
 /* =========================================================
@@ -38,12 +37,15 @@ async function adminApiRequest(endpoint, options = {}) {
             throw new Error("The server returned invalid JSON.");
         }
     } else {
-        const message = await response.text();
-        data = { message };
+        data = {
+            message: await response.text()
+        };
     }
 
     if (!data || typeof data !== "object") {
-        data = { message: String(data) };
+        data = {
+            message: String(data)
+        };
     }
 
     if (!response.ok || data.success === false) {
@@ -100,10 +102,11 @@ async function verifyAdminSession() {
         return false;
     }
 
-    // Reject an account that is already known not to be an admin.
     if (
         !cachedUser ||
-        String(cachedUser.userType).trim().toLowerCase() !== "admin"
+        String(cachedUser.userType || "")
+            .trim()
+            .toLowerCase() !== "admin"
     ) {
         localStorage.removeItem(ADMIN_TOKEN_KEY);
         localStorage.removeItem(ADMIN_USER_KEY);
@@ -118,10 +121,9 @@ async function verifyAdminSession() {
             throw new Error("Invalid session response.");
         }
 
-        const userType =
-            String(response.user.userType || "")
-                .trim()
-                .toLowerCase();
+        const userType = String(response.user.userType || "")
+            .trim()
+            .toLowerCase();
 
         if (userType !== "admin") {
             localStorage.removeItem(ADMIN_TOKEN_KEY);
@@ -130,7 +132,6 @@ async function verifyAdminSession() {
             return false;
         }
 
-        // Refresh the cached user with the verified server data.
         localStorage.setItem(
             ADMIN_USER_KEY,
             JSON.stringify(response.user)
@@ -139,18 +140,83 @@ async function verifyAdminSession() {
         return true;
 
     } catch (error) {
-        console.error("Admin session verification failed:", error);
+        console.error(
+            "Admin session verification failed:",
+            error
+        );
 
-        // Clear the session only when the server rejects authentication.
         if (error.status === 401 || error.status === 403) {
             localStorage.removeItem(ADMIN_TOKEN_KEY);
             localStorage.removeItem(ADMIN_USER_KEY);
             window.location.href = "login.html";
         }
 
-        // Network/server errors must not automatically erase a valid session.
         return false;
     }
+}
+
+
+/* =========================================================
+   USER SEARCH AND FILTER HELPERS
+========================================================= */
+
+function applyUserSearch() {
+    const userSearch = document.getElementById("userSearch");
+    const usersTableBody =
+        document.getElementById("usersTableBody");
+
+    if (!userSearch || !usersTableBody) {
+        return;
+    }
+
+    const filter = userSearch.value.trim().toLowerCase();
+
+    const rows = usersTableBody.querySelectorAll("tr");
+
+    rows.forEach(row => {
+        const text = (row.textContent || "").toLowerCase();
+
+        row.style.display =
+            text.includes(filter) ? "" : "none";
+    });
+}
+
+
+function applyPaymentFilter() {
+    const paymentFilter =
+        document.getElementById("paymentFilter");
+
+    const paymentsTableBody =
+        document.getElementById("paymentsTableBody");
+
+    if (!paymentFilter || !paymentsTableBody) {
+        return;
+    }
+
+    const selectedStatus = paymentFilter.value
+        .trim()
+        .toLowerCase();
+
+    const rows = paymentsTableBody.querySelectorAll("tr");
+
+    rows.forEach(row => {
+        const statusCell = row.cells[2];
+
+        // Keep empty-state and error messages visible.
+        if (!statusCell) {
+            row.style.display = "";
+            return;
+        }
+
+        const status = statusCell.textContent
+            .trim()
+            .toLowerCase();
+
+        row.style.display =
+            !selectedStatus || status === selectedStatus
+                ? ""
+                : "none";
+    });
 }
 
 
@@ -190,6 +256,7 @@ async function loadAdminUsers() {
                     <td colspan="7">No users found.</td>
                 </tr>
             `;
+
             return;
         }
 
@@ -205,12 +272,17 @@ async function loadAdminUsers() {
             </tr>
         `).join("");
 
+        // Reapply the search after the table is refreshed.
+        applyUserSearch();
+
     } catch (error) {
         console.error("Admin users error:", error);
 
         usersTableBody.innerHTML = `
             <tr>
-                <td colspan="7">Unable to load users. Please try again.</td>
+                <td colspan="7">
+                    Unable to load users. Please try again.
+                </td>
             </tr>
         `;
     }
@@ -243,15 +315,19 @@ async function loadAdminPayments() {
         if (payments.length === 0) {
             paymentsTableBody.innerHTML = `
                 <tr>
-                    <td colspan="3">No payment records available.</td>
+                    <td colspan="3">
+                        No payment records available.
+                    </td>
                 </tr>
             `;
+
             return;
         }
 
         paymentsTableBody.innerHTML = payments.map(payment => {
-            const userName =
-                escapeAdminHTML(payment.user?.name || "Unknown user");
+            const userName = escapeAdminHTML(
+                payment.user?.name || "Unknown user"
+            );
 
             const amount = Number(payment.amount);
 
@@ -259,8 +335,9 @@ async function loadAdminPayments() {
                 ? amount.toLocaleString("en-NG")
                 : "—";
 
-            const status =
-                escapeAdminHTML(payment.status || "Pending");
+            const status = escapeAdminHTML(
+                payment.status || "Pending"
+            );
 
             return `
                 <tr>
@@ -271,12 +348,17 @@ async function loadAdminPayments() {
             `;
         }).join("");
 
+        // Reapply the selected filter after loading payments.
+        applyPaymentFilter();
+
     } catch (error) {
         console.error("Admin payments error:", error);
 
         paymentsTableBody.innerHTML = `
             <tr>
-                <td colspan="3">Unable to load payment records. Please try again.</td>
+                <td colspan="3">
+                    Unable to load payment records. Please try again.
+                </td>
             </tr>
         `;
     }
@@ -325,14 +407,17 @@ async function loadAdminReports() {
         }
 
         reportsTableBody.innerHTML = reports.map(report => {
-            const issue = escapeAdminHTML(report.issue || "-");
+            const issue = escapeAdminHTML(
+                report.issue || "-"
+            );
 
             const parsedDate = report.createdAt
                 ? new Date(report.createdAt)
                 : null;
 
             const date =
-                parsedDate && !Number.isNaN(parsedDate.getTime())
+                parsedDate &&
+                !Number.isNaN(parsedDate.getTime())
                     ? parsedDate.toLocaleDateString()
                     : "-";
 
@@ -351,11 +436,11 @@ async function loadAdminReports() {
 
         reportsTableBody.innerHTML = `
             <tr>
-                <td colspan="2">Unable to load waste reports. Please try again.</td>
+                <td colspan="2">
+                    Unable to load waste reports. Please try again.
+                </td>
             </tr>
         `;
-
-        // Keep the last known count and chart when loading fails.
     }
 }
 
@@ -374,10 +459,17 @@ function updateReportsChart(reports) {
         return;
     }
 
-    const statuses = ["Pending", "In Progress", "Resolved"];
+    const statuses = [
+        "Pending",
+        "In Progress",
+        "Resolved"
+    ];
 
     const statusCounts = statuses.map(status =>
-        reports.filter(report => report.status === status).length
+        reports.filter(report =>
+            String(report.status || "").trim().toLowerCase() ===
+            status.toLowerCase()
+        ).length
     );
 
     if (reportsChart) {
@@ -417,9 +509,14 @@ async function loadPaymentSummary() {
         document.getElementById("totalPayments");
 
     try {
-        const data = await adminApiRequest("/payments/admin/summary");
+        const data = await adminApiRequest(
+            "/payments/admin/summary"
+        );
 
-        if (!data.summary || typeof data.summary !== "object") {
+        if (
+            !data.summary ||
+            typeof data.summary !== "object"
+        ) {
             throw new Error(
                 "The server returned an invalid payment summary."
             );
@@ -444,12 +541,9 @@ async function loadPaymentSummary() {
     } catch (error) {
         console.error("Payment summary error:", error);
 
-        // Do not display a false zero when the request fails.
         if (totalPayments) {
             totalPayments.textContent = "Unable to load";
         }
-
-        // Preserve the existing chart if the request fails.
     }
 }
 
@@ -519,7 +613,6 @@ async function initializeAdminDashboard() {
         return;
     }
 
-    // Start dashboard requests only after authentication succeeds.
     await Promise.all([
         loadAdminUsers(),
         loadAdminPayments(),
@@ -528,14 +621,13 @@ async function initializeAdminDashboard() {
     ]);
 }
 
-initializeAdminDashboard();
-
 
 /* =========================================================
    LOGOUT BUTTON
 ========================================================= */
 
-const logoutBtn = document.getElementById("logoutBtn");
+const logoutBtn =
+    document.getElementById("logoutBtn");
 
 if (logoutBtn) {
     logoutBtn.addEventListener("click", () => {
@@ -551,23 +643,11 @@ if (logoutBtn) {
    USER SEARCH
 ========================================================= */
 
-const userSearch = document.getElementById("userSearch");
+const userSearch =
+    document.getElementById("userSearch");
 
 if (userSearch) {
-    userSearch.addEventListener("keyup", function () {
-        const filter = userSearch.value.toLowerCase();
-
-        const rows = document.querySelectorAll(
-            "#usersTable tbody tr"
-        );
-
-        rows.forEach(row => {
-            const text = row.innerText.toLowerCase();
-
-            row.style.display =
-                text.includes(filter) ? "" : "none";
-        });
-    });
+    userSearch.addEventListener("input", applyUserSearch);
 }
 
 
@@ -579,25 +659,15 @@ const paymentFilter =
     document.getElementById("paymentFilter");
 
 if (paymentFilter) {
-    paymentFilter.addEventListener("change", function () {
-        const value = paymentFilter.value;
-
-        const rows = document.querySelectorAll(
-            "#paymentsTable tbody tr"
-        );
-
-        rows.forEach(row => {
-            const statusCell = row.cells[2];
-
-            if (!statusCell) {
-                row.style.display = "";
-                return;
-            }
-
-            const status = statusCell.innerText.trim();
-
-            row.style.display =
-                value === "" || status === value ? "" : "none";
-        });
-    });
+    paymentFilter.addEventListener(
+        "change",
+        applyPaymentFilter
+    );
 }
+
+
+/* =========================================================
+   START DASHBOARD
+========================================================= */
+
+initializeAdminDashboard();
