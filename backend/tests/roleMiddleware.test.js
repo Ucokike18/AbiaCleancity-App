@@ -94,3 +94,52 @@ test("Authorization normalizes role names before checking permissions", () => {
     assert.equal(nextCalled, true);
     assert.equal(response.statusCode, null);
 });
+
+test("Authorization allows landlords to access report actions", () => {
+    const response = createResponse();
+    let nextCalled = false;
+
+    authorizeRoles("landlord", "tenant")(
+        { user: { userType: "landlord" } },
+        response,
+        () => {
+            nextCalled = true;
+        }
+    );
+
+    assert.equal(nextCalled, true);
+    assert.equal(response.statusCode, null);
+});
+
+test("Authorization allows tenants to access report actions", () => {
+    const response = createResponse();
+    let nextCalled = false;
+
+    authorizeRoles("landlord", "tenant")(
+        { user: { userType: "tenant" } },
+        response,
+        () => {
+            nextCalled = true;
+        }
+    );
+
+    assert.equal(nextCalled, true);
+    assert.equal(response.statusCode, null);
+});
+
+test("Authorization rejects the unsupported resident role for report actions", () => {
+    const response = createResponse();
+    let nextCalled = false;
+
+    authorizeRoles("landlord", "tenant")(
+        { user: { userType: "resident" } },
+        response,
+        () => {
+            nextCalled = true;
+        }
+    );
+
+    assert.equal(response.statusCode, 403);
+    assert.equal(response.body.success, false);
+    assert.equal(nextCalled, false);
+});

@@ -15,16 +15,16 @@ const router = express.Router();
 router.post(
     "/",
     protect,
-    authorizeRoles("landlord", "resident"),
+    authorizeRoles("landlord", "tenant"),
     createReport
 );
 
-/* GET AUTHENTICATED RESIDENT'S REPORTS */
+/* GET AUTHENTICATED USER'S REPORTS */
 
 router.get(
     "/my",
     protect,
-    authorizeRoles("landlord", "resident"),
+    authorizeRoles("landlord", "tenant"),
     getMyReports
 );
 
