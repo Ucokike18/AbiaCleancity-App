@@ -240,6 +240,94 @@ const getUserProfile = async (req, res) => {
 
 };
 
+
+/* =========================
+   UPDATE USER PROFILE
+========================= */
+
+const updateUserProfile = async (req, res) => {
+    try {
+        const allowedFields = [
+            "name",
+            "phone",
+            "address",
+            "buildingType"
+        ];
+
+        // Reject unexpected fields, including protected account fields.
+        const submittedFields = Object.keys(req.body || {});
+        const unexpectedFields = submittedFields.filter(
+            (field) => !allowedFields.includes(field)
+        );
+
+        if (unexpectedFields.length > 0) {
+            return res.status(400).json({
+                success: false,
+                message: "Your request contains unsupported profile fields."
+            });
+        }
+
+        // Read only the fields this endpoint is permitted to change.
+        const {
+            name,
+            phone,
+            address,
+            buildingType
+        } = req.body;
+
+        // Enforce the phone-number format used by the dashboard.
+        const phoneDigits = phone.replace(/\D/g, "");
+
+        if (phoneDigits.length < 10 || phoneDigits.length > 15) {
+            return res.status(400).json({
+                success: false,
+                message: "Please provide a valid phone number."
+            });
+        }
+
+        // Update only the authenticated user's approved profile fields.
+        const updatedUser = await User.findByIdAndUpdate(
+            req.user._id,
+            {
+                $set: {
+                    name: name.trim(),
+                    phone: phone.trim(),
+                    address: address.trim(),
+                    buildingType: buildingType.trim()
+                }
+            },
+            {
+                new: true,
+                runValidators: true
+            }
+        ).select("-password");
+
+        if (!updatedUser) {
+            return res.status(404).json({
+                success: false,
+                message: "User account not found."
+            });
+        }
+
+        return successResponse(
+            res,
+            200,
+            "Profile updated successfully.",
+            {
+                user: updatedUser
+            }
+        );
+
+    } catch (error) {
+        console.error("Profile update error:", error);
+
+        return res.status(500).json({
+            success: false,
+            message: "Unable to update profile."
+        });
+    }
+};
+
 /* =========================
    GET ADMIN USERS
 ========================= */
@@ -285,5 +373,6 @@ module.exports = {
     registerUser,
     loginUser,
     getUserProfile,
+    updateUserProfile,
     getAdminUsers
 };

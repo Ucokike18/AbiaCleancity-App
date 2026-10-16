@@ -7,17 +7,17 @@ const BASE_URL = API_BASE_URL;
 async function apiRequest(endpoint, options = {}) {
 
     try {
-
         const response = await fetch(
             `${BASE_URL}${endpoint}`,
             {
+                ...options,
                 headers: {
                     "Content-Type": "application/json",
                     ...(options.headers || {})
-                },
-                ...options
+                }
             }
         );
+
 
         const contentType =
             response.headers.get("content-type") || "";
@@ -120,4 +120,18 @@ async function getUserProfile(token) {
 
     });
 
+}
+
+/* =========================
+   UPDATE USER PROFILE
+========================= */
+
+async function updateUserProfile(token, profileData) {
+    return apiRequest("/profile", {
+        method: "PUT",
+        headers: {
+            Authorization: `Bearer ${token}`
+        },
+        body: JSON.stringify(profileData)
+    });
 }

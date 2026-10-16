@@ -9,12 +9,15 @@ const {
     registerUser,
     loginUser,
     getUserProfile,
+    updateUserProfile,
     getAdminUsers
 } = require("../controllers/userController");
+
 
 const {
     registerValidation,
     loginValidation,
+    profileUpdateValidation,
     handleValidationErrors
 } = require("../middleware/validationMiddleware");
 
@@ -57,6 +60,17 @@ router.get(
     "/profile",
     protect,
     getUserProfile
+);
+
+/* UPDATE PROTECTED USER PROFILE */
+
+router.put(
+    "/profile",
+    protect,
+    authorizeRoles("landlord", "tenant"),
+    profileUpdateValidation,
+    handleValidationErrors,
+    updateUserProfile
 );
 
 /* ADMIN USERS */

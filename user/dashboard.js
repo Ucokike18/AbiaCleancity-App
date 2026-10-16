@@ -173,9 +173,6 @@ async function loadMyReports() {
     }
 }
 
-
-
-
 /* =========================================================
    USER DATA
 ========================================================= */
@@ -1661,42 +1658,18 @@ function cancelProfileEditing() {
     clearProfileErrors();
 }
 
-function saveProfileChanges(event) {
+
+async function saveProfileChanges(event) {
     if (event) {
         event.preventDefault();
     }
 
     clearProfileErrors();
 
-    const name =
-        getInputValue(
-            "editName"
-        );
-
-    const email =
-        getInputValue(
-            "editEmail"
-        );
-
-    const phone =
-        getInputValue(
-            "editPhone"
-        );
-
-    const address =
-        getInputValue(
-            "editAddress"
-        );
-
-    const buildingType =
-        getInputValue(
-            "editBuilding"
-        );
-
-    const userType =
-        getInputValue(
-            "editUserType"
-        );
+    const name = getInputValue("editName");
+    const phone = getInputValue("editPhone");
+    const address = getInputValue("editAddress");
+    const buildingType = getInputValue("editBuilding");
 
     let isValid = true;
 
@@ -1705,7 +1678,6 @@ function saveProfileChanges(event) {
             "nameError",
             "Please enter your full name."
         );
-
         isValid = false;
     }
 
@@ -1714,7 +1686,6 @@ function saveProfileChanges(event) {
             "phoneError",
             "Please enter a valid phone number."
         );
-
         isValid = false;
     }
 
@@ -1723,7 +1694,11 @@ function saveProfileChanges(event) {
             "addressError",
             "Please enter your residential address."
         );
+        isValid = false;
+    }
 
+    if (!buildingType) {
+        alert("Please select your building type.");
         isValid = false;
     }
 
@@ -1731,35 +1706,84 @@ function saveProfileChanges(event) {
         return;
     }
 
-    /*
-        The current backend exposes GET /profile
-        but does not yet expose a profile update
-        endpoint.
+    const token = localStorage.getItem(TOKEN_KEY);
 
-        Therefore these changes are applied to the
-        current frontend session only. They are not
-        written to MongoDB.
-    */
+    if (!token) {
+        alert("Your session has expired. Please log in again.");
+        redirectToLogin();
+        return;
+    }
 
-    user.name = name;
-    user.email = email;
-    user.phone = phone;
-    user.address = address;
-    user.buildingType = buildingType;
-    user.userType = userType;
-
-    syncCurrentUserSession();
-
-    displayUserInformation();
-
-    updateDashboardOverview();
-
-    cancelProfileEditing();
-
-    alert(
-        "Your profile has been updated for this session."
+    const saveButton = document.querySelector(
+        '#profileEditForm button[type="submit"]'
     );
+
+    const originalButtonText = saveButton
+        ? saveButton.textContent
+        : "";
+
+    if (saveButton) {
+        saveButton.disabled = true;
+        saveButton.textContent = "Saving...";
+    }
+
+    try {
+        const response = await updateUserProfile(token, {
+            name,
+            phone,
+            address,
+            buildingType
+        });
+
+        if (!response.user) {
+            throw new Error(
+                "The server did not return the updated profile."
+            );
+        }
+
+        // Use the server response as the source of truth.
+        user = {
+            ...user,
+            ...response.user
+        };
+
+        syncCurrentUserSession();
+        displayUserInformation();
+        updateDashboardOverview();
+        cancelProfileEditing();
+
+        alert("Your profile has been saved successfully.");
+
+    } catch (error) {
+        console.error("Profile update failed:", error);
+
+        if (error.status === 401 || error.status === 403) {
+            alert(
+                "Your session may have expired or your account cannot update this profile. Please log in again."
+            );
+
+            if (error.status === 401) {
+                localStorage.removeItem(TOKEN_KEY);
+                localStorage.removeItem(CURRENT_USER_KEY);
+                redirectToLogin();
+            }
+
+            return;
+        }
+
+        alert(
+            error.message ||
+            "Unable to save your profile. Please try again."
+        );
+
+    } finally {
+        if (saveButton) {
+            saveButton.disabled = false;
+            saveButton.textContent = originalButtonText;
+        }
+    }
 }
+
 
 function isValidPhone(phone) {
     const digits =
