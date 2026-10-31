@@ -66,9 +66,18 @@ test.beforeEach(() => {
     updateCalls = [];
 
     // Keep real JWT verification but mock user lookup.
-    User.findById = (userId) => ({
-        select: async () => fakeUsers[String(userId)] || null
-    });
+    User.findById = (userId) => {
+        const query = {
+            select() {
+                return query;
+            },
+            lean() {
+                return Promise.resolve(fakeUsers[String(userId)] || null);
+            }
+        };
+
+        return query;
+    };
 
     // Mock the database update and Mongoose query chain.
     User.findByIdAndUpdate = (userId, update, options) => {

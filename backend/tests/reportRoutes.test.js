@@ -1,4 +1,4 @@
-﻿const test = require("node:test");
+const test = require("node:test");
 const assert = require("node:assert/strict");
 const request = require("supertest");
 const jwt = require("jsonwebtoken");
@@ -76,9 +76,18 @@ test.beforeEach(() => {
     adminPopulateCalled = false;
 
     // Mock user lookup while keeping real JWT verification.
-    User.findById = (userId) => ({
-        select: async () => fakeUsers[String(userId)] || null
-    });
+    User.findById = (userId) => {
+        const query = {
+            select() {
+                return query;
+            },
+            lean() {
+                return Promise.resolve(fakeUsers[String(userId)] || null);
+            }
+        };
+
+        return query;
+    };
 
     // Mock report creation; no MongoDB records are created.
     Report.create = async (data) => {
