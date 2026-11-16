@@ -89,18 +89,107 @@ const getMyReports = async (req, res) => {
 
 const getAdminReports = async (req, res) => {
     try {
+        const pageSize = 20;
+
+        const requestedPage = req.query.page === undefined
+            ? 1
+            : Number(req.query.page);
+
+        if (
+            !Number.isSafeInteger(requestedPage) ||
+            requestedPage < 1
+        ) {
+            return res.status(400).json({
+                success: false,
+                message: "Page must be a positive whole number."
+            });
+        }
+
+        // Calculate total reports and status counts in one aggregation.
+        const summary = await Report.aggregate([
+            {
+                $group: {
+                    _id: null,
+
+                    totalReports: {
+                        $sum: 1
+                    },
+
+                    pending: {
+                        $sum: {
+                            $cond: [
+                                { $eq: ["$status", "Pending"] },
+                                1,
+                                0
+                            ]
+                        }
+                    },
+
+                    inProgress: {
+                        $sum: {
+                            $cond: [
+                                { $eq: ["$status", "In Progress"] },
+                                1,
+                                0
+                            ]
+                        }
+                    },
+
+                    resolved: {
+                        $sum: {
+                            $cond: [
+                                { $eq: ["$status", "Resolved"] },
+                                1,
+                                0
+                            ]
+                        }
+                    }
+                }
+            }
+        ]);
+
+        const statistics = summary[0] || {
+            totalReports: 0,
+            pending: 0,
+            inProgress: 0,
+            resolved: 0
+        };
+
+        const totalReports = statistics.totalReports;
+        const totalPages = Math.ceil(totalReports / pageSize);
+
+        // Keep requested pages within the available page range.
+        const currentPage = totalPages === 0
+            ? 1
+            : Math.min(requestedPage, totalPages);
+
         const reports = await Report.find()
             .populate("user", "name email address")
-            .sort({
-                createdAt: -1
-            });
+            .sort({ createdAt: -1 })
+            .skip((currentPage - 1) * pageSize)
+            .limit(pageSize);
 
         return successResponse(
             res,
             200,
             "Waste reports retrieved successfully.",
             {
-                reports
+                reports,
+
+                pagination: {
+                    currentPage,
+                    pageSize,
+                    totalReports,
+                    totalPages,
+                    hasNextPage: currentPage < totalPages,
+                    hasPreviousPage: currentPage > 1
+                },
+
+                statusCounts: {
+                    pending: statistics.pending,
+                    inProgress: statistics.inProgress,
+                    resolved: statistics.resolved
+                }
             }
         );
 

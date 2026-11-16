@@ -369,30 +369,70 @@ async function loadAdminPayments() {
    LOAD ADMIN WASTE REPORTS
 ========================================================= */
 
-async function loadAdminReports() {
+
+let currentAdminReportsPage = 1;
+
+let isLoadingAdminReports = false;
+
+async function loadAdminReports(page = currentAdminReportsPage) {
     const reportsTableBody =
         document.getElementById("reportsTableBody");
 
     const totalReports =
         document.getElementById("totalReports");
 
-    if (!reportsTableBody) {
+    const prevButton =
+        document.getElementById("prevReportsPage");
+
+    const nextButton =
+        document.getElementById("nextReportsPage");
+
+    const pageInfo =
+        document.getElementById("reportsPageInfo");
+    if (!reportsTableBody || isLoadingAdminReports) {
         return;
     }
 
-    try {
-        const data = await adminApiRequest("/reports/admin");
+    isLoadingAdminReports = true;
 
-        if (!Array.isArray(data.reports)) {
+    try {
+        const data = await adminApiRequest(
+            `/reports/admin?page=${page}`
+        );
+
+        if (
+            !Array.isArray(data.reports) ||
+            !data.pagination ||
+            !data.statusCounts
+        ) {
             throw new Error(
-                "The server returned an invalid waste reports response."
+                "The server returned an invalid paginated reports response."
             );
         }
 
         const reports = data.reports;
+        const pagination = data.pagination;
+
+        currentAdminReportsPage = pagination.currentPage;
 
         if (totalReports) {
-            totalReports.textContent = reports.length;
+            totalReports.textContent = pagination.totalReports;
+        }
+
+        if (pageInfo) {
+            pageInfo.textContent =
+                `Page ${pagination.currentPage} of ${Math.max(
+                    pagination.totalPages,
+                    1
+                )}`;
+        }
+
+        if (prevButton) {
+            prevButton.disabled = !pagination.hasPreviousPage;
+        }
+
+        if (nextButton) {
+            nextButton.disabled = !pagination.hasNextPage;
         }
 
         if (reports.length === 0) {
@@ -401,35 +441,32 @@ async function loadAdminReports() {
                     <td colspan="2">No waste reports available.</td>
                 </tr>
             `;
+        } else {
+            reportsTableBody.innerHTML = reports.map(report => {
+                const issue = escapeAdminHTML(
+                    report.issue || "-"
+                );
 
-            updateReportsChart([]);
-            return;
+                const parsedDate = report.createdAt
+                    ? new Date(report.createdAt)
+                    : null;
+
+                const date =
+                    parsedDate &&
+                        !Number.isNaN(parsedDate.getTime())
+                        ? parsedDate.toLocaleDateString()
+                        : "-";
+
+                return `
+                    <tr>
+                        <td>${issue}</td>
+                        <td>${escapeAdminHTML(date)}</td>
+                    </tr>
+                `;
+            }).join("");
         }
 
-        reportsTableBody.innerHTML = reports.map(report => {
-            const issue = escapeAdminHTML(
-                report.issue || "-"
-            );
-
-            const parsedDate = report.createdAt
-                ? new Date(report.createdAt)
-                : null;
-
-            const date =
-                parsedDate &&
-                !Number.isNaN(parsedDate.getTime())
-                    ? parsedDate.toLocaleDateString()
-                    : "-";
-
-            return `
-                <tr>
-                    <td>${issue}</td>
-                    <td>${escapeAdminHTML(date)}</td>
-                </tr>
-            `;
-        }).join("");
-
-        updateReportsChart(reports);
+        updateReportsChart(data.statusCounts);
 
     } catch (error) {
         console.error("Admin waste reports error:", error);
@@ -441,9 +478,30 @@ async function loadAdminReports() {
                 </td>
             </tr>
         `;
+    } finally {
+        isLoadingAdminReports = false;
     }
 }
 
+const prevReportsPageButton =
+    document.getElementById("prevReportsPage");
+
+const nextReportsPageButton =
+    document.getElementById("nextReportsPage");
+
+if (prevReportsPageButton) {
+    prevReportsPageButton.addEventListener("click", () => {
+        if (currentAdminReportsPage > 1) {
+            loadAdminReports(currentAdminReportsPage - 1);
+        }
+    });
+}
+
+if (nextReportsPageButton) {
+    nextReportsPageButton.addEventListener("click", () => {
+        loadAdminReports(currentAdminReportsPage + 1);
+    });
+}
 
 /* =========================================================
    WASTE REPORTS CHART
@@ -451,7 +509,7 @@ async function loadAdminReports() {
 
 let reportsChart;
 
-function updateReportsChart(reports) {
+function updateReportsChart(statusCounts) {
     const chartCanvas =
         document.getElementById("reportsChart");
 
@@ -465,12 +523,11 @@ function updateReportsChart(reports) {
         "Resolved"
     ];
 
-    const statusCounts = statuses.map(status =>
-        reports.filter(report =>
-            String(report.status || "").trim().toLowerCase() ===
-            status.toLowerCase()
-        ).length
-    );
+    const chartData = [
+        Number(statusCounts.pending) || 0,
+        Number(statusCounts.inProgress) || 0,
+        Number(statusCounts.resolved) || 0
+    ];
 
     if (reportsChart) {
         reportsChart.destroy();
@@ -483,7 +540,7 @@ function updateReportsChart(reports) {
             labels: statuses,
 
             datasets: [{
-                data: statusCounts
+                data: chartData
             }]
         },
 
@@ -498,7 +555,6 @@ function updateReportsChart(reports) {
         }
     });
 }
-
 
 /* =========================================================
    LOAD PAYMENT SUMMARY

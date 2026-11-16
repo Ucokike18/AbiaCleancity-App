@@ -37,21 +37,26 @@ const existingReports = [
         _id: "report-1",
         user: "landlord-test-id",
         issue: "Missed waste collection",
-        status: "Pending"
+        status: "Pending",
+        createdAt: new Date("2026-10-02T10:00:00Z")
     },
     {
         _id: "report-2",
         user: "tenant-test-id",
         issue: "Overflowing public bin",
-        status: "In Progress"
+        status: "In Progress",
+        createdAt: new Date("2026-10-03T10:00:00Z")
     }
 ];
 
 let originalFindById;
 let originalCreate;
 let originalFind;
+let originalAggregate;
 let createdReports;
 let adminPopulateCalled;
+let adminSkip;
+let adminLimit;
 
 function makeToken(userId) {
     return jwt.sign(
@@ -71,9 +76,12 @@ test.beforeEach(() => {
     originalFindById = User.findById;
     originalCreate = Report.create;
     originalFind = Report.find;
+    originalAggregate = Report.aggregate;
 
     createdReports = [];
     adminPopulateCalled = false;
+    adminSkip = null;
+    adminLimit = null;
 
     // Mock user lookup while keeping real JWT verification.
     User.findById = (userId) => {
@@ -95,7 +103,7 @@ test.beforeEach(() => {
             _id: "created-report-" + (createdReports.length + 1),
             user: data.user,
             issue: data.issue,
-            status: "Pending"
+            status: "Pending",
         };
 
         createdReports.push(report);
@@ -105,23 +113,82 @@ test.beforeEach(() => {
     // Mock the query chain used by both report retrieval routes.
     Report.find = (filter) => {
         const query = {
+            skipValue: 0,
+            limitValue: null,
+
             populate() {
                 adminPopulateCalled = true;
                 return this;
             },
 
-            sort: async () => {
+            sort(options) {
+                this.sortOptions = options;
+                return this;
+            },
+
+            skip(value) {
+                adminSkip = value;
+                this.skipValue = value;
+                return this;
+            },
+
+            limit(value) {
+                adminLimit = value;
+                this.limitValue = value;
+                return this;
+            },
+
+            then(resolve, reject) {
+                let reports;
+
                 if (!filter || !filter.user) {
-                    return existingReports;
+                    reports = existingReports;
+                } else {
+                    reports = existingReports.filter(
+                        (report) => report.user === String(filter.user)
+                    );
                 }
 
-                return existingReports.filter(
-                    (report) => report.user === String(filter.user)
-                );
+                if (this.sortOptions?.createdAt) {
+                    const direction = this.sortOptions.createdAt;
+
+                    reports = [...reports].sort((a, b) => {
+                        const dateA = new Date(a.createdAt).getTime();
+                        const dateB = new Date(b.createdAt).getTime();
+
+                        return direction === -1
+                            ? dateB - dateA
+                            : dateA - dateB;
+                    });
+                }
+
+                const start = this.skipValue;
+                const end = this.limitValue === null
+                    ? undefined
+                    : start + this.limitValue;
+
+                return Promise.resolve(reports.slice(start, end))
+                    .then(resolve, reject);
             }
         };
 
         return query;
+    };
+
+    // Mock the aggregate used to calculate all-report statistics.
+    Report.aggregate = async () => {
+        return [{
+            totalReports: existingReports.length,
+            pending: existingReports.filter(
+                (report) => report.status === "Pending"
+            ).length,
+            inProgress: existingReports.filter(
+                (report) => report.status === "In Progress"
+            ).length,
+            resolved: existingReports.filter(
+                (report) => report.status === "Resolved"
+            ).length
+        }];
     };
 });
 
@@ -129,6 +196,7 @@ test.afterEach(() => {
     User.findById = originalFindById;
     Report.create = originalCreate;
     Report.find = originalFind;
+    Report.aggregate = originalAggregate;
 });
 
 test("Landlord can submit a report through the HTTP route", async () => {
@@ -186,15 +254,157 @@ test("Users can retrieve only their own reports", async () => {
     );
 });
 
-test("Admins can retrieve all reports with user details populated", async () => {
+test("Admins can retrieve paginated reports with summary statistics", async () => {
     const response = await request(app)
         .get("/api/reports/admin")
         .set(authorize("admin-test-id"));
 
     assert.equal(response.status, 200);
     assert.equal(response.body.success, true);
+
+    // Report records
     assert.equal(response.body.reports.length, 2);
+    // Reports must be returned newest first.
+    assert.equal(
+        response.body.reports[0].issue,
+        "Overflowing public bin"
+    );
+
+    assert.equal(
+        response.body.reports[1].issue,
+        "Missed waste collection"
+    );
     assert.equal(adminPopulateCalled, true);
+
+    // Pagination metadata
+    assert.equal(response.body.pagination.currentPage, 1);
+    assert.equal(response.body.pagination.pageSize, 20);
+    assert.equal(response.body.pagination.totalReports, 2);
+    assert.equal(response.body.pagination.totalPages, 1);
+    assert.equal(response.body.pagination.hasNextPage, false);
+    assert.equal(response.body.pagination.hasPreviousPage, false);
+
+    // Status statistics across all reports
+    assert.equal(response.body.statusCounts.pending, 1);
+    assert.equal(response.body.statusCounts.inProgress, 1);
+    assert.equal(response.body.statusCounts.resolved, 0);
+
+    // Database pagination methods
+    assert.equal(adminSkip, 0);
+    assert.equal(adminLimit, 20);
+});
+
+test("Admins can retrieve the second page of reports", async () => {
+    const originalLength = existingReports.length;
+
+    try {
+        // Add temporary mock reports to create a second page.
+        existingReports.push(
+            ...Array.from({ length: 20 }, (_, index) => ({
+                _id: `pagination-test-${index + 1}`,
+                user: "landlord-test-id",
+                issue: `Pagination test report ${index + 1}`,
+                status: "Pending",
+                createdAt: new Date(
+                    Date.UTC(2026, 8, 30 - index)
+                )
+            }))
+        );
+
+        const response = await request(app)
+            .get("/api/reports/admin?page=2")
+            .set(authorize("admin-test-id"));
+
+        assert.equal(response.status, 200);
+        assert.equal(response.body.success, true);
+
+        // The second page should contain the remaining two reports.
+        assert.equal(response.body.reports.length, 2);
+        assert.equal(
+            response.body.reports[0].issue,
+            "Pagination test report 19"
+        );
+        assert.equal(
+            response.body.reports[1].issue,
+            "Pagination test report 20"
+        );
+
+        // Pagination metadata.
+        assert.equal(response.body.pagination.currentPage, 2);
+        assert.equal(response.body.pagination.pageSize, 20);
+        assert.equal(response.body.pagination.totalReports, 22);
+        assert.equal(response.body.pagination.totalPages, 2);
+        assert.equal(response.body.pagination.hasPreviousPage, true);
+        assert.equal(response.body.pagination.hasNextPage, false);
+
+        // Confirm the database query requested the correct offset.
+        assert.equal(adminSkip, 20);
+        assert.equal(adminLimit, 20);
+
+    } finally {
+        // Restore the original fixture after the test.
+        existingReports.length = originalLength;
+    }
+});
+
+test("Admin pagination clamps requests beyond the last page", async () => {
+    const originalLength = existingReports.length;
+
+    try {
+        existingReports.push(
+            ...Array.from({ length: 20 }, (_, index) => ({
+                _id: `out-of-range-test-${index + 1}`,
+                user: "landlord-test-id",
+                issue: `Out of range report ${index + 1}`,
+                status: "Pending",
+                createdAt: new Date(
+                    Date.UTC(2026, 8, 30 - index)
+                )
+            }))
+        );
+
+        const response = await request(app)
+            .get("/api/reports/admin?page=999")
+            .set(authorize("admin-test-id"));
+
+        assert.equal(response.status, 200);
+        assert.equal(response.body.success, true);
+
+        assert.equal(response.body.pagination.currentPage, 2);
+        assert.equal(response.body.pagination.totalPages, 2);
+        assert.equal(response.body.pagination.totalReports, 22);
+        assert.equal(response.body.pagination.hasPreviousPage, true);
+        assert.equal(response.body.pagination.hasNextPage, false);
+
+        assert.equal(response.body.reports.length, 2);
+        assert.equal(
+            response.body.reports[0].issue,
+            "Out of range report 19"
+        );
+        assert.equal(
+            response.body.reports[1].issue,
+            "Out of range report 20"
+        );
+
+        assert.equal(adminSkip, 20);
+        assert.equal(adminLimit, 20);
+
+    } finally {
+        existingReports.length = originalLength;
+    }
+});
+
+test("Admin report pagination rejects invalid page numbers", async () => {
+    const response = await request(app)
+        .get("/api/reports/admin?page=0")
+        .set(authorize("admin-test-id"));
+
+    assert.equal(response.status, 400);
+    assert.equal(response.body.success, false);
+    assert.equal(
+        response.body.message,
+        "Page must be a positive whole number."
+    );
 });
 
 test("Unsupported resident role is denied report access", async () => {
