@@ -217,13 +217,29 @@ Phase 7 focused on backend performance, API reliability, database query behaviou
 
 Completed controlled tests included:
 
-| Test                          |      Result                 |
-| Administrative HTTP benchmark | 180/180 successful requests |
-| Mixed API workload            | 40/40 successful requests   |
-| Backend automated tests       | 34 passing tests            |
-| Report pagination             | Implemented and tested      |
-| Database query diagnostics    | Completed                   |
+Test
 
+Result
+
+Administrative HTTP benchmark
+
+180/180 successful requests
+
+Mixed API workload
+
+40/40 successful requests
+
+Backend automated tests
+
+34 passing tests
+
+Report pagination
+
+Implemented and tested
+
+Database query diagnostics
+
+Completed
 The performance tests used isolated test data and a dedicated test database.
 
 These results demonstrate successful execution under the tested conditions. They should not be interpreted as a guarantee of production-scale capacity or the results of a sustained public load test.
