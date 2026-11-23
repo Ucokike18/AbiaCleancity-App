@@ -286,7 +286,7 @@ Frontend Developer | Web Development Tutor
 
 GitHub: [@Ucokike18](https://github.com/Ucokike18)
 
-LinkedIn: [[Connect on LinkedIn](https://www.linkedin.com/)](https://www.linkedin.com/in/uchenna-okike-b06759286/)
+LinkedIn: (https://www.linkedin.com/in/uchenna-okike-b06759286/)
 
 ---
 
