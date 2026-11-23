@@ -1,39 +1,40 @@
-ABIACLEANCITY
+# AbiaCleanCity
 
-A FULL-STACK WASTE MANAGEMENT PLATFORM
+**A Full-Stack Waste Management Platform**
 
 AbiaCleanCity is a web-based waste management platform designed to improve how residents report waste-related issues and how administrators monitor and manage those reports.
 
 The application provides role-based access for landlords, tenants, and administrators, combining a responsive frontend with a RESTful backend API and MongoDB database.
 
-PROJECT OVERVIEW
+## Project Overview
 
 Waste management requires effective communication between residents and the people responsible for managing waste collection and related services.
 
 AbiaCleanCity provides a digital platform where registered users can submit waste reports, monitor their submissions, and manage their profiles, while administrators can oversee users, reports, and payment records through administrative interfaces.
 
-KEY FEATURES
-User Management and Authentication
+## Key Features
+
+### User Management and Authentication
 - User registration and login.
 - JWT-based authentication.
 - Protected user profiles.
 - Profile information updates.
 - Role-based access control.
 
-Waste Reporting
+### Waste Reporting
 - Waste report submission by landlords and tenants.
 - Access to personal report records.
 - Administrative access to submitted reports.
 - Paginated administrative report management.
 - Report status summaries.
 
-Administrative Management
+### Administrative Management
 - Administrative user listing.
 - Administrative waste report management.
 - Payment record retrieval.
 - Payment summaries covering paid, pending, and failed records.
 
-Security and API Reliability
+### Security and API Reliability
 - Password hashing.
 - Authentication and role authorization middleware.
 - Request validation.
@@ -42,7 +43,7 @@ Security and API Reliability
 - Security headers through Helmet.
 - Database-aware health-check endpoint.
 
-User Roles
+## User Roles
 
 | Role | Access |
 |---|---|
@@ -52,38 +53,38 @@ User Roles
 
 Access to protected resources is controlled through authentication and role-based authorization.
 
-Technology Stack
+## Technology Stack
 
-Frontend
+**Frontend**
 - HTML5
 - CSS3
 - JavaScript
 - Responsive web design
 
-Backend
+**Backend**
 - Node.js
 - Express.js
 - REST API
 - JWT authentication
 - Express Validator
 
-Database
+**Database**
 - MongoDB
 - Mongoose
 
-Security and Testing
+**Security and Testing**
 - Helmet
 - CORS
 - Express Rate Limit
 - Node.js built-in test runner
 - Supertest
 
-Development Tools
+**Development Tools**
 - Git and GitHub
 - Visual Studio Code
 - Postman
 
-Application Architecture
+## Application Architecture
 
 AbiaCleanCity uses a frontend/backend architecture.
 
@@ -92,7 +93,7 @@ AbiaCleanCity uses a frontend/backend architecture.
 3. MongoDB stores application records, including users, reports, and payments.
 4. JWT authentication and role-based middleware protect restricted API resources.
 
-Main API Routes
+### Main API Routes
 
 | API Endpoint | Purpose |
 |---|---|
@@ -107,9 +108,9 @@ Main API Routes
 | `/api/payments/admin/summary` | Retrieve payment statistics |
 | `/api/health` | Check backend and database health |
 
-Project Structure
+## Project Structure
 
-
+```text
 AbiaCleanCity/
 │
 ├── admin/
@@ -140,10 +141,11 @@ AbiaCleanCity/
 ├── index.html
 ├── login.html
 └── schedule.html
+```
 
-GETTING STARTED
+## Getting Started
 
-Prerequisites
+### Prerequisites
 
 Install the following:
 
@@ -152,57 +154,66 @@ Install the following:
 - MongoDB database (local MongoDB or MongoDB Atlas)
 - Git
 
-1. Clone the Repository
+### 1. Clone the Repository
 
+```bash
 git clone https://github.com/Ucokike18/AbiaCleancity-App.git
 cd AbiaCleancity-App
+```
 
-2. Install Backend Dependencies
+### 2. Install Backend Dependencies
 
+```bash
 cd backend
 npm install
+```
 
-3. Configure Environment Variables
+### 3. Configure Environment Variables
 
 Create a `.env` file inside the `backend` directory using `.env.example` as a reference.
 
 Required environment variables:
 
+```env
 PORT=5000
 MONGO_URI=your_mongodb_connection_string
 JWT_SECRET=your_jwt_secret
 FRONTEND_URL=http://localhost:5501
-
+```
 
 Replace the example values with your own configuration. Never commit your actual `.env` file or expose database credentials and authentication secrets.
 
-4. Start the Backend
+### 4. Start the Backend
 
 From the `backend` directory:
 
+```bash
 npm start
-
+```
 
 For development with automatic restarts:
 
+```bash
 npm run dev
-
+```
 
 The backend runs on port `5000` by default.
 
-5. Run the Frontend
+### 5. Run the Frontend
 
 Open the project root in Visual Studio Code and use the Live Server extension to serve the frontend.
 
 Configure the frontend origin to match the `FRONTEND_URL` environment variable in the backend.
 
-Running Automated Tests
+## Running Automated Tests
 
 The backend uses Node.js's built-in test runner and Supertest for API testing.
 
 From the `backend` directory:
 
+```bash
 npm test
+```
 
 The automated test suites cover:
 
@@ -211,40 +222,25 @@ The automated test suites cover:
 - Report routes and administrative pagination.
 - Role-based authorization.
 
-Performance and Scalability Testing
+## Performance and Scalability Testing
 
 Phase 7 focused on backend performance, API reliability, database query behaviour, and administrative report pagination.
 
 Completed controlled tests included:
 
-Test
+| Test | Result |
+|---|---|
+| Administrative HTTP benchmark | 180/180 successful requests |
+| Mixed API workload | 40/40 successful requests |
+| Backend automated tests | 34 passing tests |
+| Report pagination | Implemented and tested |
+| Database query diagnostics | Completed |
 
-Result
-
-Administrative HTTP benchmark
-
-180/180 successful requests
-
-Mixed API workload
-
-40/40 successful requests
-
-Backend automated tests
-
-34 passing tests
-
-Report pagination
-
-Implemented and tested
-
-Database query diagnostics
-
-Completed
 The performance tests used isolated test data and a dedicated test database.
 
 These results demonstrate successful execution under the tested conditions. They should not be interpreted as a guarantee of production-scale capacity or the results of a sustained public load test.
 
-Security Measures
+## Security Measures
 
 The backend implements several security measures:
 
@@ -258,7 +254,7 @@ The backend implements several security measures:
 - Additional rate limiting for registration and login.
 - Environment-based secret management.
 
-Current Project Status
+## Current Project Status
 
 Completed development areas include:
 
@@ -272,63 +268,26 @@ Completed development areas include:
 
 The application is currently maintained as a development project and has not been presented as a publicly deployed production service.
 
-Roadmap and Future Improvements
+## Future Improvements
 
-AbiaCleanCity provides a foundation for digital waste management, but there are opportunities to expand its functionality, improve the user experience, and strengthen its operational capabilities in future versions.
+Potential future development areas include:
 
-The following improvements are potential development priorities:
+- Deployment and production hosting.
+- Expanded payment processing integration.
+- Further automated frontend testing.
+- Additional monitoring and performance evaluation.
+- Expanded reporting and administrative analytics.
 
-1. Payment Integration
-- Integrate a secure payment gateway to support online payments.
-- Allow users to view their payment history and transaction status.
-- Introduce payment receipts and transaction verification.
+## Author
 
-2. Waste Collection Management
-- Introduce waste collection scheduling and assignment.
-- Enable administrators to assign collection tasks to service personnel.
-- Allow users to track collection progress and completion.
-
-3. Notifications and Communication
-- Introduce email and in-app notifications.
-- Notify users when their waste reports are received, updated, or resolved.
-- Provide administrators with alerts for new reports and pending tasks.
-
-4. Reporting and Analytics
-- Expand the administrative dashboard with more detailed analytics.
-- Introduce date-based and location-based report filtering.
-- Provide downloadable reports and performance summaries.
-
-5. Location-Based Features
-- Integrate maps and location services.
-- Allow users to provide precise waste collection or incident locations.
-- Support geographical analysis of reported waste issues.
-
-6. Testing and Quality Assurance
-- Expand automated frontend testing.
-- Introduce end-to-end testing for critical user journeys.
-- Extend API performance and security testing.
-
-7. Deployment and Monitoring
-- Deploy the application to a production environment.
-- Introduce application monitoring, logging, and error tracking.
-- Establish automated deployment and backup workflows.
-
-8. Accessibility and User Experience
-- Improve accessibility in accordance with WCAG guidelines.
-- Further refine mobile responsiveness and navigation.
-- Introduce additional usability improvements based on user feedback.
-
-These improvements will be considered in subsequent versions as the platform evolves.
-
-Author
-
-Uchenna Okike
+**Uchenna Okike**
 
 Frontend Developer | Web Development Tutor
 
 GitHub: [@Ucokike18](https://github.com/Ucokike18)
 
-LinkedIn: [Connect on LinkedIn]([https://www.linkedin.com/](https://www.linkedin.com/in/uchenna-okike-b06759286/))
+LinkedIn: [[Connect on LinkedIn](https://www.linkedin.com/)](https://www.linkedin.com/in/uchenna-okike-b06759286/)
 
+---
 
 *Built to explore practical web development, REST API design, authentication, database management, and performance optimisation through a real-world waste management application.*
