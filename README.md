@@ -251,7 +251,7 @@ Completed controlled tests included:
 
 | Test | Result |
 |---|---|
-| Administrative HTTP benchmark | 180/180 successful requests |
+| Administrative HTTP benchmark | 180/180 successful requests across two independent runs |
 | Mixed API workload | 40/40 successful requests |
 | Backend automated tests | 34 passing tests |
 | Report pagination | Implemented and tested |
