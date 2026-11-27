@@ -108,16 +108,17 @@ AbiaCleanCity uses a frontend/backend architecture.
 
 | API Endpoint | Purpose |
 |---|---|
-| `/api/users/register` | Register a user |
-| `/api/users/login` | Authenticate a user |
-| `/api/users/profile` | Retrieve the authenticated user's profile |
-| `/api/users/admin/users` | Retrieve administrative user records |
-| `/api/reports/` | Submit a waste report |
-| `/api/reports/my` | Retrieve the authenticated user's reports |
-| `/api/reports/admin` | Retrieve paginated administrative reports |
-| `/api/payments/admin` | Retrieve payment records |
-| `/api/payments/admin/summary` | Retrieve payment statistics |
-| `/api/health` | Check backend and database health |
+| `POST /api/users/register` | Register a user |
+| `POST /api/users/login` | Authenticate a user |
+| `GET /api/users/profile` | Retrieve the authenticated user's profile |
+| `PUT /api/users/profile` | Update the authenticated user's profile |
+| `GET /api/users/admin/users` | Retrieve administrative user records |
+| `POST /api/reports/` | Submit a waste report |
+| `GET /api/reports/my` | Retrieve the authenticated user's reports |
+| `GET /api/reports/admin` | Retrieve administrative reports |
+| `GET /api/payments/admin` | Retrieve payment records |
+| `GET /api/payments/admin/summary` | Retrieve payment statistics |
+| `GET /api/health` | Check backend and database health |
 
 ## Project Structure
 
@@ -125,19 +126,23 @@ AbiaCleanCity uses a frontend/backend architecture.
 AbiaCleanCity/
 │
 ├── admin/
+│   ├── admin.css
+│   ├── admin.js
 │   ├── dashboard.html
+│   ├── login.css
 │   ├── login.html
-│   └── admin.js
+│   └── login.js
 │
 ├── backend/
 │   ├── config/
-│   │   └── db.js
 │   ├── controllers/
 │   ├── middleware/
 │   ├── models/
 │   ├── routes/
 │   ├── scripts/
+│   ├── services/
 │   ├── tests/
+│   ├── utils/
 │   ├── app.js
 │   ├── server.js
 │   ├── package.json
@@ -147,6 +152,11 @@ AbiaCleanCity/
 ├── js/
 ├── register/
 ├── user/
+│   ├── dashboard.html
+│   ├── dashboard.js
+│   ├── user.css
+│   └── user.js
+│
 ├── contactUs.html
 ├── features.html
 ├── index.html
@@ -279,15 +289,53 @@ Completed development areas include:
 
 The application is currently maintained as a development project and has not been presented as a publicly deployed production service.
 
-## Future Improvements
+## Roadmap and Future Improvements
 
-Potential future development areas include:
+AbiaCleanCity provides a foundation for digital waste management, but there are opportunities to expand its functionality, improve the user experience, and strengthen its operational capabilities in future versions.
 
-- Deployment and production hosting.
-- Expanded payment processing integration.
-- Further automated frontend testing.
-- Additional monitoring and performance evaluation.
-- Expanded reporting and administrative analytics.
+The following improvements are potential development priorities:
+
+### 1. Payment Integration
+- Integrate a secure payment gateway to support online payments.
+- Allow users to view their payment history and transaction status.
+- Introduce payment receipts and transaction verification.
+
+### 2. Waste Collection Management
+- Introduce waste collection scheduling and assignment.
+- Enable administrators to assign collection tasks to service personnel.
+- Allow users to track collection progress and completion.
+
+### 3. Notifications and Communication
+- Introduce email and in-app notifications.
+- Notify users when their waste reports are received, updated, or resolved.
+- Provide administrators with alerts for new reports and pending tasks.
+
+### 4. Reporting and Analytics
+- Expand the administrative dashboard with more detailed analytics.
+- Introduce date-based and location-based report filtering.
+- Provide downloadable reports and performance summaries.
+
+### 5. Location-Based Features
+- Integrate maps and location services.
+- Allow users to provide precise waste collection or incident locations.
+- Support geographical analysis of reported waste issues.
+
+### 6. Testing and Quality Assurance
+- Expand automated frontend testing.
+- Introduce end-to-end testing for critical user journeys.
+- Extend API performance and security testing.
+
+### 7. Deployment and Monitoring
+- Deploy the application to a production environment.
+- Introduce application monitoring, logging, and error tracking.
+- Establish automated deployment and backup workflows.
+
+### 8. Accessibility and User Experience
+- Improve accessibility in accordance with WCAG guidelines.
+- Further refine mobile responsiveness and navigation.
+- Introduce additional usability improvements based on user feedback.
+
+These improvements will be considered in subsequent versions as the platform evolves.
 
 ## Author
 
@@ -297,7 +345,7 @@ Frontend Developer | Web Development Tutor
 
 GitHub: [@Ucokike18](https://github.com/Ucokike18)
 
-LinkedIn: (https://www.linkedin.com/in/uchenna-okike-b06759286/)
+LinkedIn: [Connect on LinkedIn](https://www.linkedin.com/in/uchenna-okike-b06759286/)
 
 ---
 
