@@ -12,6 +12,17 @@ Waste management requires effective communication between residents and the peop
 
 AbiaCleanCity provides a digital platform where registered users can submit waste reports, monitor their submissions, and manage their profiles, while administrators can oversee users, reports, and payment records through administrative interfaces.
 
+## Application Screenshots
+
+### Landing Page
+![AbiaCleanCity Landing Page](docs/screenshots/landing-page.png)
+
+### User Dashboard
+![AbiaCleanCity User Dashboard](docs/screenshots/user-dashboard.png)
+
+### Admin Dashboard
+![AbiaCleanCity Admin Dashboard](docs/screenshots/admin-dashboard.png)
+
 ## Key Features
 
 ### User Management and Authentication
